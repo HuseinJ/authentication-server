@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: authuser
+    password: authpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+
+# JWT Configuration
+jwt:
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj
+    MzEfYyjiWA4R4/M2bS1+fWIcPm15A8Qqz/7aZQEuGNx3VvHLBNjp
+    -----END PRIVATE KEY-----
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
+    4lgOEePzNm0tfn1iHD5teQPEKs/+2mUBLhjcd1bxywTY6c
+    -----END PUBLIC KEY-----
+  expiration: 3600000  # 1 hour
+  refresh-expiration: 604800000  # 7 days
+  issuer: auth-service
+
+# Server Configuration
+server:
+  port: 8081

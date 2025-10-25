@@ -1,0 +1,8 @@
+package com.hjusic.auth.domain.user.model;
+
+public enum UserErrorCode {
+  USER_NOT_FOUND,
+  USER_CREATION_FAILED,
+  USER_DELETION_FAILED,
+  VALIDATION_FAILED
+}
