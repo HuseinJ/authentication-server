@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public class UserCreatedEvent extends UserEvent {
 
-  Password password;
-  Set<RoleName> roles;
+  private final Password password;
+  private final Set<RoleName> roles;
 
   private UserCreatedEvent(String eventId, Instant occurredOn, Username username, Password password,
       Email email, Set<RoleName> roles) {
