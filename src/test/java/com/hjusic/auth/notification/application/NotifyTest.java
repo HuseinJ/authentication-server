@@ -43,6 +43,7 @@ class NotifyTest {
   private static final String VALID_RECIPIENT = "test@example.com";
   private static final String VALID_CONTENT = "Test notification content";
   private static final String SENDER = "noreply@mail.com";
+  private static final String SUBJECT = "Test notification";
 
   @Nested
   @DisplayName("When sending valid notification")
@@ -56,6 +57,7 @@ class NotifyTest {
           NotificationType.EMAIL,
           VALID_RECIPIENT,
           SENDER,
+          SUBJECT,
           VALID_CONTENT
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(returnedNotification);
@@ -201,6 +203,7 @@ class NotifyTest {
           NotificationType.EMAIL,
           longRecipient,
           SENDER,
+          SUBJECT,
           VALID_CONTENT
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);
@@ -219,6 +222,7 @@ class NotifyTest {
           NotificationType.EMAIL,
           VALID_RECIPIENT,
           SENDER,
+          SUBJECT,
           longContent
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);
@@ -237,6 +241,7 @@ class NotifyTest {
           NotificationType.EMAIL,
           VALID_RECIPIENT,
           SENDER,
+          SUBJECT,
           specialContent
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);

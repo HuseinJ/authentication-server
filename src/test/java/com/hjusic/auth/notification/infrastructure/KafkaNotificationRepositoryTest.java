@@ -41,6 +41,7 @@ class KafkaNotificationRepositoryTest {
   private static final String TOPIC_NAME = "notification";
   private static final String RECIPIENT = "test@example.com";
   private static final String SENDER = "noreply@mail.com";
+  private static final String SUBJECT = "Test notification";
   private static final String CONTENT = "Test notification content";
 
   private Notification testNotification;
@@ -52,6 +53,7 @@ class KafkaNotificationRepositoryTest {
         NotificationType.EMAIL,
         RECIPIENT,
         SENDER,
+        SUBJECT,
         CONTENT
     );
     testEvent = testNotification.send();
@@ -105,6 +107,7 @@ class KafkaNotificationRepositoryTest {
         NotificationType.EMAIL,
         RECIPIENT,
         SENDER,
+        SUBJECT,
         specialContent
     );
     NotificationSent specialEvent = specialNotification.send();
@@ -124,6 +127,7 @@ class KafkaNotificationRepositoryTest {
         NotificationType.EMAIL,
         RECIPIENT,
         SENDER,
+        SUBJECT,
         longContent
     );
     NotificationSent longEvent = longNotification.send();

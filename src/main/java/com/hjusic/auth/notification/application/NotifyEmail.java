@@ -26,7 +26,7 @@ public class NotifyEmail {
       return Either.left(NotificationError.of("Content cannot be blank", NotificationErrorCode.BODY_EMPTY));
     }
 
-    var notification = Notification.of(NotificationType.EMAIL, recipient, "noreply@mail.com", content);
+    var notification = Notification.of(NotificationType.EMAIL, recipient, "noreply@mail.com", "notify", content);
 
     return Either.right(notifications.publish(notification.send()));
   }

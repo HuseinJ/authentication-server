@@ -1,7 +1,9 @@
 package com.hjusic.auth.domain.user.model;
 
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
+import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
+import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessStartedEvent;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,4 +22,8 @@ public abstract class User {
   private Set<String> roles;
 
   public abstract String getUserType();
+
+  public ResetPasswordProcessStartedEvent startResetPasswordProcess() {
+    return ResetPasswordProcessStartedEvent.of(username, email, ResetPasswordToken.create());
+  }
 }

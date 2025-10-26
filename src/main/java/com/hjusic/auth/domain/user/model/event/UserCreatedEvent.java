@@ -7,6 +7,8 @@ import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import java.time.Instant;
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -13,10 +13,11 @@ public class Notification {
   private final NotificationType type;
   private final String recipient;
   private final String sender;
+  private final String subject;
   private final String content;
 
-  public static Notification of(NotificationType type, String recipient, String sender, String content) {
-    return new Notification(UUID.randomUUID(), type, recipient, sender, content);
+  public static Notification of(NotificationType type, String recipient, String sender, String subject, String content) {
+    return new Notification(UUID.randomUUID(), type, recipient, sender, subject, content);
   }
 
   public NotificationSent send() {
