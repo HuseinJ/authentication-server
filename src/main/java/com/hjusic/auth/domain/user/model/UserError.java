@@ -31,4 +31,8 @@ public class UserError {
     return new UserError(message, UserErrorCode.USER_CREATION_FAILED);
   }
 
+  public static UserError invalidResetPasswordToken(String message) {
+    return new UserError(message, UserErrorCode.RESET_PASSWORD_TOKEN_VALIDATION_FAILED);
+  }
+
 }

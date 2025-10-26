@@ -10,6 +10,8 @@ public interface Users {
 
   Either<UserError, User> findByUsername(String username);
 
+  Either<UserError, User> validateResetPasswordToken(String username, String token);
+
   User trigger(UserEvent event);
 
 }

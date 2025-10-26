@@ -33,8 +33,27 @@ public class UserAppRepository implements Users {
   @Override
   public Either<UserError, User> findByUsername(String username) {
     return userRepository.findByUsername(username)
-        .map(userDatabaseEntity -> Either.<UserError, User>right(userMapper.toModelObject(userDatabaseEntity)))
+        .map(userDatabaseEntity -> Either.<UserError, User>right(
+            userMapper.toModelObject(userDatabaseEntity)))
         .orElse(Either.left(UserError.userNotFound(username)));
+  }
+
+  @Override
+  public Either<UserError, User> validateResetPasswordToken(String username, String token) {
+
+    var userEntity = userRepository.findByUsername(username).orElseThrow(
+        () -> new IllegalArgumentException("User does not exist: " + username)
+    );
+
+    var resetPasswordTokens = resetPasswordProcessDatabaseRepository.findByUser(userEntity);
+
+    if (resetPasswordTokens.stream().anyMatch(
+        resetPasswordToken -> resetPasswordToken.getTokenHash().equals(token)
+            && resetPasswordToken.getExpiresAt().isAfter(LocalDateTime.now()))) {
+      return Either.right(userMapper.toModelObject(userEntity));
+    }
+
+    return Either.left(UserError.invalidResetPasswordToken("Invalid or expired reset password token for user: " + username));
   }
 
   @Override
@@ -79,7 +98,7 @@ public class UserAppRepository implements Users {
     return userMapper.toModelObject(user);
   }
 
-  private User handle(UserCreatedEvent event){
+  private User handle(UserCreatedEvent event) {
     var userDatabaseEntity = UserDatabaseEntity.builder()
         .email(event.getEmail().getValue())
         .username(event.getUsername().getValue())
