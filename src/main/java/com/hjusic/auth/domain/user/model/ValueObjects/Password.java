@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.user.model.ValueObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hjusic.auth.domain.user.model.UserError;
 import io.vavr.control.Either;
 import lombok.AccessLevel;

@@ -1,23 +1,29 @@
 package com.hjusic.auth.domain.user.model.event;
 
-import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import java.time.Instant;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class UserDeletedEvent extends UserEvent {
 
-  private UserDeletedEvent(String eventId, Instant occurredOn,
-      Username username,
-      Email email) {
-    super(eventId, occurredOn, username, email);
+  // Optional: extra fields if needed
+
+  // static factory method for creation
+  public static UserDeletedEvent of(Username username) {
+    UserDeletedEvent event = new UserDeletedEvent();
+    event.setEventId(java.util.UUID.randomUUID().toString());
+    event.setOccurredOn(Instant.now());
+    event.setUsername(username);
+    return event;
   }
 
-  public static UserDeletedEvent of(Username username) {
-    return new UserDeletedEvent(
-        java.util.UUID.randomUUID().toString(),
-        Instant.now(),
-        username,
-        null
-    );
+  @Override
+  public String getEventType() {
+    return "UserDeletedEvent";
   }
 }

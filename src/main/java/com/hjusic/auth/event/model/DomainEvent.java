@@ -1,13 +1,14 @@
 package com.hjusic.auth.event.model;
 
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class DomainEvent {
-
-  private final String eventId;
-  private final Instant occurredOn;
+  private String eventId;
+  private Instant occurredOn;
 }

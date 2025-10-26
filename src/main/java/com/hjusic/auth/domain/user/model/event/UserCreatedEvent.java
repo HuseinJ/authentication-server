@@ -1,35 +1,36 @@
 package com.hjusic.auth.domain.user.model.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hjusic.auth.domain.role.infrastructure.RoleName;
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import java.time.Instant;
 import java.util.Set;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class UserCreatedEvent extends UserEvent {
 
-  private final Password password;
-  private final Set<RoleName> roles;
+  @JsonIgnore
+  private Password password;
+  private Set<RoleName> roles;
 
-  private UserCreatedEvent(String eventId, Instant occurredOn, Username username, Password password,
-      Email email, Set<RoleName> roles) {
-    super(eventId, occurredOn, username, email);
-    this.password = password;
-    this.roles = roles;
+  public static UserCreatedEvent of(Username username, Email email, Password password, Set<RoleName> roles) {
+    UserCreatedEvent event = new UserCreatedEvent();
+    event.setEventId(java.util.UUID.randomUUID().toString());
+    event.setOccurredOn(Instant.now());
+    event.setUsername(username);
+    event.setEmail(email);
+    event.setPassword(password);
+    event.setRoles(roles);
+    return event;
   }
 
-  public static UserCreatedEvent of(Username username, Email email, Password password,
-      Set<RoleName> roles) {
-    return new UserCreatedEvent(
-        java.util.UUID.randomUUID().toString(),
-        Instant.now(),
-        username,
-        password,
-        email,
-        roles
-    );
+  @Override
+  public String getEventType() {
+    return "UserCreatedEvent";
   }
 }

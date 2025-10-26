@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @Testcontainers
-@ActiveProfiles({"test", "jwt"})
+@ActiveProfiles({"test", "jwt", "kafka"})
 public abstract class BaseIntegrationTest {
 
   private static final PostgreSQLContainer<?> postgres;
