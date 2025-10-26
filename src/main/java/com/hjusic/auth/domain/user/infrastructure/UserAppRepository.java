@@ -3,6 +3,8 @@ package com.hjusic.auth.domain.user.infrastructure;
 import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.UserError;
 import com.hjusic.auth.domain.user.model.Users;
+import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
+import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessComplete;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessStartedEvent;
 import com.hjusic.auth.domain.user.model.event.UserCreatedEvent;
 import com.hjusic.auth.domain.user.model.event.UserDeletedEvent;
@@ -48,7 +50,7 @@ public class UserAppRepository implements Users {
     var resetPasswordTokens = resetPasswordProcessDatabaseRepository.findByUser(userEntity);
 
     if (resetPasswordTokens.stream().anyMatch(
-        resetPasswordToken -> resetPasswordToken.getTokenHash().equals(token)
+        resetPasswordToken -> ResetPasswordToken.verifyToken(token, resetPasswordToken.getTokenHash())
             && resetPasswordToken.getExpiresAt().isAfter(LocalDateTime.now()))) {
       return Either.right(userMapper.toModelObject(userEntity));
     }
@@ -62,12 +64,21 @@ public class UserAppRepository implements Users {
       case UserCreatedEvent e -> handle(e);
       case UserDeletedEvent e -> handle(e);
       case ResetPasswordProcessStartedEvent e -> handle(e);
+      case ResetPasswordProcessComplete e -> handle(e);
       default -> throw new IllegalArgumentException("Unhandled event type: " + event.getClass());
     };
 
     domainEventPublisher.publish(event);
 
     return user;
+  }
+
+  private User handle(ResetPasswordProcessComplete e) {
+    var user = userRepository.findByUsername(e.getUsername().getValue()).orElseThrow(
+        () -> new IllegalArgumentException("User does not exist: " + e.getUsername())
+    );
+    user.setPassword(e.getPassword().getValue());
+    return userMapper.toModelObject(userRepository.save(user));
   }
 
   private User handle(ResetPasswordProcessStartedEvent e) {

@@ -8,3 +8,8 @@ spring:
         format_sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
+
+auth:
+  admin:
+    username: "admin"
+    email: "admin@test.com"

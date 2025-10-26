@@ -3,6 +3,7 @@ package com.hjusic.auth.domain.user.api;
 import com.hjusic.auth.BaseIntegrationTest;
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseRepository;
 import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.user.infrastructure.ResetPasswordProcessDatabaseRepository;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseRepository;
 import java.util.Set;
@@ -29,6 +30,9 @@ public abstract class UserApiIntegrationTestBase extends BaseIntegrationTest {
   protected RoleDatabaseRepository roleDatabaseRepository;
 
   @Autowired
+  protected ResetPasswordProcessDatabaseRepository resetPasswordProcessRepository;
+
+  @Autowired
   protected PasswordEncoder passwordEncoder;
 
   @Autowired
@@ -39,6 +43,7 @@ public abstract class UserApiIntegrationTestBase extends BaseIntegrationTest {
 
   @BeforeEach
   void commonSetUp() {
+    resetPasswordProcessRepository.deleteAll();
     userRepository.deleteAll();
     var adminRole = roleDatabaseRepository.findByName(RoleName.ROLE_ADMIN).get();
     var guestRole = roleDatabaseRepository.findByName(RoleName.ROLE_GUEST).get();
