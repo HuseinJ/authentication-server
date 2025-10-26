@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UserDeletedEvent extends UserEvent {
-
-  // Optional: extra fields if needed
-
-  // static factory method for creation
+  
   public static UserDeletedEvent of(Username username) {
     UserDeletedEvent event = new UserDeletedEvent();
     event.setEventId(java.util.UUID.randomUUID().toString());

@@ -3,9 +3,11 @@ package com.hjusic.auth.notification.model;
 import com.hjusic.auth.notification.model.event.NotificationSent;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
 public class Notification {
   private final UUID id;
   private final NotificationType type;
