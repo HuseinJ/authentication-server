@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: false
     open-in-view: false
 
@@ -22,6 +22,11 @@ spring:
       properties:
         spring.json.add.type.headers: true
         spring.json.trusted.packages: '*'
+
+auth:
+  admin:
+    username: "admin"
+    email: "admin@test.com"
 
 # JWT Configuration
 jwt:

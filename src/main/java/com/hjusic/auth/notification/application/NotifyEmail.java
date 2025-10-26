@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class Notify {
+public class NotifyEmail {
 
   private final Notifications notifications;
 
