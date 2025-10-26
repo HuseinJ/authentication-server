@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "passwort-reset-process")
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
 public class ResetPasswordProcessDatabaseEntity {
 
   @Id
@@ -43,7 +45,7 @@ public class ResetPasswordProcessDatabaseEntity {
 
   // Track if token has been used
   @Column(name = "used", nullable = false)
-  private final boolean used = false;
+  private boolean used;
 
   @Column(name = "used_at")
   private LocalDateTime usedAt;

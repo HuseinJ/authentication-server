@@ -49,9 +49,23 @@ public class UserAppRepository implements Users {
 
     var resetPasswordTokens = resetPasswordProcessDatabaseRepository.findByUser(userEntity);
 
-    if (resetPasswordTokens.stream().anyMatch(
-        resetPasswordToken -> ResetPasswordToken.verifyToken(token, resetPasswordToken.getTokenHash())
-            && resetPasswordToken.getExpiresAt().isAfter(LocalDateTime.now()))) {
+    // Find valid token
+    var validToken = resetPasswordTokens.stream()
+        .filter(resetPasswordToken ->
+            ResetPasswordToken.verifyToken(token, resetPasswordToken.getTokenHash())
+                && !resetPasswordToken.isUsed()
+                && resetPasswordToken.getExpiresAt().isAfter(LocalDateTime.now())
+        )
+        .findFirst();
+
+    if (validToken.isPresent()) {
+      var resetProcess = validToken.get();
+
+      // Mark as used
+      resetProcess.setUsed(true);
+      resetProcess.setUsedAt(LocalDateTime.now());
+      resetPasswordProcessDatabaseRepository.save(resetProcess);
+
       return Either.right(userMapper.toModelObject(userEntity));
     }
 
@@ -91,6 +105,7 @@ public class UserAppRepository implements Users {
         .expiresAt(e.getResetPasswordToken().getExpiresOn())
         .tokenHash(e.getResetPasswordToken().getTokenHash())
         .user(user)
+        .used(false)
         .build();
 
     resetPasswordProcessDatabaseRepository.save(resetPasswordProcesStarted);
