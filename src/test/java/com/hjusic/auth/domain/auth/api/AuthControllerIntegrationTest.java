@@ -3,6 +3,7 @@ package com.hjusic.auth.domain.auth.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hjusic.auth.BaseIntegrationTest;
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
+import com.hjusic.auth.domain.user.infrastructure.ResetPasswordProcessDatabaseRepository;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +36,14 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
   private UserDatabaseRepository userRepository;
 
   @Autowired
+  private ResetPasswordProcessDatabaseRepository resetPasswordProcessRepository;
+
+  @Autowired
   private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setUp() {
+    resetPasswordProcessRepository.deleteAll();
     userRepository.deleteAll();
     var user = UserDatabaseEntity.builder()
         .username("integration_user")

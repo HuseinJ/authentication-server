@@ -35,4 +35,8 @@ public class UserError {
     return new UserError(message, UserErrorCode.RESET_PASSWORD_TOKEN_VALIDATION_FAILED);
   }
 
+  public static UserError unauthenticated(String message) {
+    return new UserError(message, UserErrorCode.UNAUTHENTICATED);
+  }
+
 }

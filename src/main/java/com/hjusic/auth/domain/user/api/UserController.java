@@ -3,9 +3,11 @@ package com.hjusic.auth.domain.user.api;
 import com.hjusic.auth.domain.user.api.dto.CompleteResetPasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.CreateUserRequest;
 import com.hjusic.auth.domain.user.api.dto.InitiateResetPasswordRequest;
+import com.hjusic.auth.domain.user.api.dto.UpdateRoleRequest;
 import com.hjusic.auth.domain.user.application.CreateUser;
 import com.hjusic.auth.domain.user.application.DeleteUser;
 import com.hjusic.auth.domain.user.application.ResetPasswordProcess;
+import com.hjusic.auth.domain.user.application.UpdateRoles;
 import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.Users;
 import java.util.Collection;
@@ -31,6 +33,7 @@ public class UserController {
   private final CreateUser createUser;
   private final DeleteUser deleteUser;
   private final ResetPasswordProcess resetPasswordProcess;
+  private final UpdateRoles updateRoles;
 
   @GetMapping
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -69,6 +72,17 @@ public class UserController {
 
     return deleteUser.delete(username)
         .fold(
+        error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
+        ResponseEntity::ok
+    );
+  }
+
+  @PostMapping("/roles/{username}")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  public ResponseEntity<?> updateUserRoles(@PathVariable String username, @RequestBody
+      UpdateRoleRequest updateRoleRequest) {
+
+    return updateRoles.updateRoles(username, updateRoleRequest.getRoles()).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
         ResponseEntity::ok
     );

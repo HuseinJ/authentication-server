@@ -1,11 +1,14 @@
 package com.hjusic.auth.domain.user.infrastructure;
 
+import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseRepository;
+import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.UserError;
 import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessComplete;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessStartedEvent;
+import com.hjusic.auth.domain.user.model.event.UpdateRolesEvent;
 import com.hjusic.auth.domain.user.model.event.UserCreatedEvent;
 import com.hjusic.auth.domain.user.model.event.UserDeletedEvent;
 import com.hjusic.auth.domain.user.model.event.UserEvent;
@@ -13,6 +16,7 @@ import com.hjusic.auth.event.model.DomainEventPublisher;
 import io.vavr.control.Either;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class UserAppRepository implements Users {
 
   private final UserDatabaseRepository userRepository;
+  private final RoleDatabaseRepository roleDatabaseEntityRepository;
   private final ResetPasswordProcessDatabaseRepository resetPasswordProcessDatabaseRepository;
   private final UserMapper userMapper;
   private final DomainEventPublisher domainEventPublisher;
@@ -69,7 +74,8 @@ public class UserAppRepository implements Users {
       return Either.right(userMapper.toModelObject(userEntity));
     }
 
-    return Either.left(UserError.invalidResetPasswordToken("Invalid or expired reset password token for user: " + username));
+    return Either.left(UserError.invalidResetPasswordToken(
+        "Invalid or expired reset password token for user: " + username));
   }
 
   @Override
@@ -79,12 +85,25 @@ public class UserAppRepository implements Users {
       case UserDeletedEvent e -> handle(e);
       case ResetPasswordProcessStartedEvent e -> handle(e);
       case ResetPasswordProcessComplete e -> handle(e);
+      case UpdateRolesEvent e -> handle(e);
       default -> throw new IllegalArgumentException("Unhandled event type: " + event.getClass());
     };
 
     domainEventPublisher.publish(event);
 
     return user;
+  }
+
+  private User handle(UpdateRolesEvent e) {
+    var user = userRepository.findByUsername(e.getUsername().getValue()).orElseThrow(
+        () -> new IllegalArgumentException("User does not exist: " + e.getUsername())
+    );
+
+    var roles = roleDatabaseEntityRepository.findAllByNameIn(e.getRoles().stream().map(Role::getName).collect(
+        Collectors.toSet()));
+    user.setRoles(roles);
+
+    return userMapper.toModelObject(userRepository.save(user));
   }
 
   private User handle(ResetPasswordProcessComplete e) {

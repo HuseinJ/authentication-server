@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.user.model;
 
+import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
@@ -22,7 +23,7 @@ public abstract class User {
 
   private Username username;
   private Email email;
-  private Set<String> roles;
+  private Set<Role> roles;
 
   public abstract String getUserType();
 

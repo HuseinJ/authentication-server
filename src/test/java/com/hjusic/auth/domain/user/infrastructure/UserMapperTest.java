@@ -2,9 +2,11 @@ package com.hjusic.auth.domain.user.infrastructure;
 
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseEntity;
 import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.AdminUser;
 import com.hjusic.auth.domain.user.model.GuestUser;
 import com.hjusic.auth.domain.user.model.User;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +44,7 @@ class UserMapperTest {
     AdminUser adminUser = (AdminUser) result;
     assertThat(adminUser.getUsername().getValue()).isEqualTo("adminuser");
     assertThat(adminUser.getEmail().getValue()).isEqualTo("admin@example.com");
-    assertThat(adminUser.getRoles()).containsExactly("ROLE_ADMIN");
+    assertThat(adminUser.getRoles()).containsExactly(Role.of(RoleName.ROLE_ADMIN));
   }
 
   @Test
@@ -66,7 +68,7 @@ class UserMapperTest {
     GuestUser guestUser = (GuestUser) result;
     assertThat(guestUser.getUsername().getValue()).isEqualTo("guestuser");
     assertThat(guestUser.getEmail().getValue()).isEqualTo("guest@example.com");
-    assertThat(guestUser.getRoles()).containsExactly("ROLE_GUEST");
+    assertThat(guestUser.getRoles()).containsExactly(Role.of(RoleName.ROLE_GUEST));
   }
 
   @Test
@@ -112,7 +114,7 @@ class UserMapperTest {
     // Then
     assertThat(result).isInstanceOf(AdminUser.class);
     AdminUser adminUser = (AdminUser) result;
-    assertThat(adminUser.getRoles()).containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_GUEST");
+    assertThat(adminUser.getRoles()).containsExactlyInAnyOrder(Role.of(RoleName.ROLE_ADMIN), Role.of(RoleName.ROLE_GUEST));
   }
 
   @Test
@@ -138,7 +140,7 @@ class UserMapperTest {
     // Then
     assertThat(result.getRoles())
         .hasSize(2)
-        .containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_GUEST");
+        .containsExactlyInAnyOrder(Role.of(RoleName.ROLE_ADMIN), Role.of(RoleName.ROLE_GUEST));
   }
 
   @Test
@@ -159,27 +161,5 @@ class UserMapperTest {
 
     // Then
     assertThat(result.getUsername().getValue()).isEqualTo("specificUsername123");
-  }
-
-  @Test
-  void shouldConvertRoleNamesToStrings() {
-    // Given
-    RoleDatabaseEntity adminRole = RoleDatabaseEntity.builder()
-        .name(RoleName.ROLE_ADMIN)
-        .build();
-
-    UserDatabaseEntity entity = UserDatabaseEntity.builder()
-        .username("roletest")
-        .email("roletest@example.com")
-        .roles(Set.of(adminRole))
-        .build();
-
-    // When
-    User result = userMapper.toModelObject(entity);
-
-    // Then
-    assertThat(result.getRoles())
-        .allMatch(role -> role instanceof String)
-        .containsExactly("ROLE_ADMIN");
   }
 }

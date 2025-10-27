@@ -31,10 +31,6 @@ public class RoleDatabaseEntity {
   @Builder.Default
   private Set<UserDatabaseEntity> users = new HashSet<>();
 
-  public RoleDatabaseEntity(RoleName name) {
-    this.name = name;
-  }
-
   public RoleDatabaseEntity(RoleName name, String description) {
     this.name = name;
     this.description = description;

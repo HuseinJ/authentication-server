@@ -1,9 +1,11 @@
 package com.hjusic.auth.domain.user.model;
 
 import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
+import com.hjusic.auth.domain.user.model.event.UpdateRolesEvent;
 import com.hjusic.auth.domain.user.model.event.UserCreatedEvent;
 import com.hjusic.auth.domain.user.model.event.UserDeletedEvent;
 import io.vavr.control.Either;
@@ -39,5 +41,15 @@ public class AdminUser extends User{
     }
 
     return Either.right(UserDeletedEvent.of(username));
+  }
+
+  public Either<UserError, UpdateRolesEvent> updateRoles(User user, Set<Role> roles, Users users){
+    var potentialUser = users.findByUsername(user.getUsername().getValue());
+
+    if(potentialUser.isLeft()) {
+      return Either.left(potentialUser.getLeft());
+    }
+
+    return Either.right(UpdateRolesEvent.of(user.getUsername(), roles));
   }
 }

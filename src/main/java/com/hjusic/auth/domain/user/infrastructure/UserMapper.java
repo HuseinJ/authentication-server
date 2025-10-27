@@ -1,7 +1,9 @@
 package com.hjusic.auth.domain.user.infrastructure;
 
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseEntity;
+import com.hjusic.auth.domain.role.infrastructure.RoleMapper;
 import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.AdminUser;
 import com.hjusic.auth.domain.user.model.GuestUser;
 import com.hjusic.auth.domain.user.model.User;
@@ -9,22 +11,22 @@ import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
   public User toModelObject(UserDatabaseEntity entity) {
-    Set<String> roleNames = entity.getRoles().stream()
-        .map(role -> role.getName().name())
+    Set<Role> roles = entity.getRoles().stream()
+        .map(role -> Role.of(role.getName()))
         .collect(Collectors.toSet());
 
-    // Determine the primary role (highest privilege)
     RoleName primaryRole = determinePrimaryRole(entity);
 
     return switch (primaryRole) {
-      case ROLE_ADMIN -> mapToAdminUser(entity, roleNames);
-      case ROLE_GUEST -> mapToGuestUser(entity, roleNames);
+      case ROLE_ADMIN -> mapToAdminUser(entity, roles);
+      case ROLE_GUEST -> mapToGuestUser(entity, roles);
     };
   }
 
@@ -38,7 +40,7 @@ public class UserMapper {
     return RoleName.ROLE_GUEST;
   }
 
-  private AdminUser mapToAdminUser(UserDatabaseEntity entity, Set<String> roles) {
+  private AdminUser mapToAdminUser(UserDatabaseEntity entity, Set<Role> roles) {
 
     var username = Username.of(entity.getUsername());
 
@@ -59,7 +61,7 @@ public class UserMapper {
         .build();
   }
 
-  private GuestUser mapToGuestUser(UserDatabaseEntity entity, Set<String> roles) {
+  private GuestUser mapToGuestUser(UserDatabaseEntity entity, Set<Role> roles) {
     var username = Username.of(entity.getUsername());
 
     if(username.isLeft()) {
