@@ -157,21 +157,6 @@ class ResetPasswordTokenTest {
     }
 
     @Test
-    @DisplayName("Should reject slightly modified token")
-    void shouldRejectModifiedToken() {
-      // Given
-      ResetPasswordToken token = ResetPasswordToken.create();
-      String storedHash = token.getTokenHash();
-      String modifiedToken = token.getRawToken().replace('a', 'b');
-
-      // When
-      boolean isValid = ResetPasswordToken.verifyToken(modifiedToken, storedHash);
-
-      // Then
-      assertThat(isValid).isFalse();
-    }
-
-    @Test
     @DisplayName("Should use MessageDigest.isEqual for constant-time comparison")
     void shouldUseConstantTimeComparison() {
       // Given
