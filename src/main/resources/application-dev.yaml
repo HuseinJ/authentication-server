@@ -28,7 +28,6 @@ auth:
     username: "admin"
     email: "admin@test.com"
 
-# JWT Configuration
 jwt:
   private-key: |
     -----BEGIN PRIVATE KEY-----

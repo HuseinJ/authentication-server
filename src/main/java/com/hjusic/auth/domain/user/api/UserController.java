@@ -1,9 +1,11 @@
 package com.hjusic.auth.domain.user.api;
 
+import com.hjusic.auth.domain.user.api.dto.ChangePasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.CompleteResetPasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.CreateUserRequest;
 import com.hjusic.auth.domain.user.api.dto.InitiateResetPasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.UpdateRoleRequest;
+import com.hjusic.auth.domain.user.application.ChangePassword;
 import com.hjusic.auth.domain.user.application.CreateUser;
 import com.hjusic.auth.domain.user.application.DeleteUser;
 import com.hjusic.auth.domain.user.application.ResetPasswordProcess;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +37,7 @@ public class UserController {
   private final DeleteUser deleteUser;
   private final ResetPasswordProcess resetPasswordProcess;
   private final UpdateRoles updateRoles;
+  private final ChangePassword changePassword;
 
   @GetMapping
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -85,6 +89,22 @@ public class UserController {
     return updateRoles.updateRoles(username, updateRoleRequest.getRoles()).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
         ResponseEntity::ok
+    );
+  }
+
+  @PutMapping("/password")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    return changePassword.changePassword(
+        request.getOldPassword(),
+        request.getNewPassword()
+    ).fold(
+        error -> ResponseEntity.badRequest().body(Map.of(
+            "error", error.getMessage()
+        )),
+        user -> ResponseEntity.ok(Map.of(
+            "message", "Password successfully changed"
+        ))
     );
   }
 

@@ -7,12 +7,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ResetPasswordProcessComplete extends UserEvent {
+public class ChangePasswordEvent extends UserEvent {
 
   private Password password;
 
-  public static ResetPasswordProcessComplete of(Username username, Password password) {
-    ResetPasswordProcessComplete event = new ResetPasswordProcessComplete();
+  public static ChangePasswordEvent of(Username username, Password password) {
+    var event = new ChangePasswordEvent();
     event.setEventId(java.util.UUID.randomUUID().toString());
     event.setOccurredOn(java.time.Instant.now());
     event.setUsername(username);
@@ -22,6 +22,6 @@ public class ResetPasswordProcessComplete extends UserEvent {
 
   @Override
   public String getEventType() {
-    return "ResetPasswordProcessComplete";
+    return "ChangePasswordEvent";
   }
 }
