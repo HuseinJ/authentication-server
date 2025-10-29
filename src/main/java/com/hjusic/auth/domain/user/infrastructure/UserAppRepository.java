@@ -6,6 +6,7 @@ import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.UserError;
 import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
+import com.hjusic.auth.domain.user.model.event.ChangePasswordEvent;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessComplete;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessStartedEvent;
 import com.hjusic.auth.domain.user.model.event.UpdateRolesEvent;
@@ -86,12 +87,23 @@ public class UserAppRepository implements Users {
       case ResetPasswordProcessStartedEvent e -> handle(e);
       case ResetPasswordProcessComplete e -> handle(e);
       case UpdateRolesEvent e -> handle(e);
+      case ChangePasswordEvent e -> handle(e);
       default -> throw new IllegalArgumentException("Unhandled event type: " + event.getClass());
     };
 
     domainEventPublisher.publish(event);
 
     return user;
+  }
+
+  private User handle(ChangePasswordEvent e) {
+    var user = userRepository.findByUsername(e.getUsername().getValue()).orElseThrow(
+        () -> new IllegalArgumentException("User does not exist: " + e.getUsername())
+    );
+
+    user.setPassword(e.getPassword().getValue());
+
+    return userMapper.toModelObject(userRepository.save(user));
   }
 
   private User handle(UpdateRolesEvent e) {

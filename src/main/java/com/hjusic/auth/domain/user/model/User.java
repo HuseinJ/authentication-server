@@ -5,6 +5,7 @@ import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
+import com.hjusic.auth.domain.user.model.event.ChangePasswordEvent;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessComplete;
 import com.hjusic.auth.domain.user.model.event.ResetPasswordProcessStartedEvent;
 import io.vavr.control.Either;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Data
@@ -44,5 +46,12 @@ public abstract class User {
     }
 
     throw new IllegalStateException("Potential user does not match current user");
+  }
+
+  public Either<UserError, ChangePasswordEvent> changePassword(Password password, String oldPassword, String passwordHash, PasswordEncoder passwordEncoder) {
+    if(passwordEncoder.matches(oldPassword, passwordHash)) {
+      return Either.right(ChangePasswordEvent.of(username, password));
+    }
+    return Either.left(UserError.validationFailed("Old password does not match"));
   }
 }
