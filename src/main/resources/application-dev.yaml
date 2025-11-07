@@ -24,6 +24,9 @@ spring:
         spring.json.trusted.packages: '*'
 
 auth:
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
   admin:
     username: "admin"
     email: "admin@test.com"
@@ -31,13 +34,42 @@ auth:
 jwt:
   private-key: |
     -----BEGIN PRIVATE KEY-----
-    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj
-    MzEfYyjiWA4R4/M2bS1+fWIcPm15A8Qqz/7aZQEuGNx3VvHLBNjp
+    MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCidI+7+WHenPNw
+    73/x8ct8w8eTh2vGTDuP0Cj96ZTMeR4NyHzSftqyLK4Sbp9NB8NlolFSI0pxLZ6B
+    FOVIuuFsbEQzGYEPaaXlfLa0/M4nUt0f7fhtMSM9uPDkDSUlUQ8ihAoW9sxSRHQJ
+    nBWyKjYgkFtGVoEELM5YBSfkUtflgmbU8+lBIHY51zWT2B12gHpP5gI1suRUT+lC
+    J1HivIMA33oojEtQy3PPyXpDEDbwJdBuR5G+bQ39aNyN9TOJ/Y2AlxdNvZYiVLEl
+    7rtMzOpyV/3lPLzfa6hk6uI+Cr2HYBkB0cij4DVGAu8kxQIkWFZ22balCNIR190T
+    GOX51PGRAgMBAAECggEABc2OGNPWqCIJHB6h/l15vFIt/doXgnTUp9VysWc3lno5
+    FZr0wnwfib/I1AW5kQHW+/lpWDrEfPh5MfkyG3/5b2sKoJynnIpUj7b9u8dQAd2W
+    4n4YoqXfsWO6zxqdGhEkLkJzLdDRCZtCXdmCeOPDHTSq3f9XCnQjRsegXiqLZbpN
+    GNtaoHjPU/ooLr7+oGBZ5+1LNPbb3eN7J+/F8QTMtg6+GYj+bJXcw54WlpT9CxUb
+    HJzVYn8AszBi584+MH5W+d9or6xGtwdC862WXMgBXmASOCPg2PRQ26fjUVqkKI5K
+    6TIlemzfxrV4yDvpGuBShJqXrDOaeWr7ADW4UAyAhQKBgQDgo27wUVoaNeXFIY6u
+    gQFmA98If0XSCuX3lndz0LnDpB+TwWZH9D+q5yNKC/sJwe3jXyMoFjU13dxI6LQM
+    PFfxjRYstL+jAI5NO0zwUKVsjb1AK/ORoHOV7AO6ABZ25rPbDWe2imfBiXCS9NC/
+    kekYFZggbaMFVxTVYwC2sdjHywKBgQC5IrUJI+OwPfUjzJg81XU02raxupMJPOjK
+    edQvyAF2/CO5UXxoc5aunHHk59i+gWvZL/Rn+xEccvo/285w0ZSbmZJaIXiahWZg
+    +HYL5soyEYBSUGdaLXRR5rkfI5qoepFmJNox9/goG8rzyRWvg0v8/mMg5qnanYOq
+    7x0MbBeokwKBgHtrb91bZPy3lhkb2c+ok0MgZ168xnijgjvokJKyIA4MU0kT3gU0
+    ffKA8ZOSR4fR48ijkaZJpUyGK6xnJdz/HnZZRNClMhD1kjl+lkQGmwysR0lFnJnr
+    JPY+6ME9oRoMoM5+a/gPzPe5cn9bQIGwQff4jU9rzUB22rxum4rE5czHAoGAC4Ri
+    OMBX0MX58xEuQ1KQKQqWJPZTYVa9sKLllVde5/UFj+jG0YSnUhN/blsR+7/3Ypp+
+    HN3ckaWBdemJrTEMiqWCGkNMymgUF2I9jb38xCKclgJUe6KqQtIUoCBJ5cNCOlV+
+    kW84q94WwRW4WKPVXVbB+fD/jg8QetjHONecnSsCgYBkfmJiDmU2UunSLy9msvH7
+    m8p+q4QpIKWKYrdhPa6Uzd3XRJP60bYR/hSRKLqYO/vWT+XSd97H1Fn91nZIjAgP
+    rArf3UxqK2nRU14Hx0a1kumHlIGt7qOAVkTE6EdgPxRPxyZhPOV4stPyFZ+VsVUT
+    dOD2itXntz2KUa5hDXvH2A==
     -----END PRIVATE KEY-----
   public-key: |
     -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
-    4lgOEePzNm0tfn1iHD5teQPEKs/+2mUBLhjcd1bxywTY6c
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAonSPu/lh3pzzcO9/8fHL
+    fMPHk4drxkw7j9Ao/emUzHkeDch80n7asiyuEm6fTQfDZaJRUiNKcS2egRTlSLrh
+    bGxEMxmBD2ml5Xy2tPzOJ1LdH+34bTEjPbjw5A0lJVEPIoQKFvbMUkR0CZwVsio2
+    IJBbRlaBBCzOWAUn5FLX5YJm1PPpQSB2Odc1k9gddoB6T+YCNbLkVE/pQidR4ryD
+    AN96KIxLUMtzz8l6QxA28CXQbkeRvm0N/WjcjfUzif2NgJcXTb2WIlSxJe67TMzq
+    clf95Ty832uoZOriPgq9h2AZAdHIo+A1RgLvJMUCJFhWdtm2pQjSEdfdExjl+dTx
+    kQIDAQAB
     -----END PUBLIC KEY-----
   expiration: 3600000  # 1 hour
   refresh-expiration: 604800000  # 7 days
@@ -46,3 +78,11 @@ jwt:
 # Server Configuration
 server:
   port: 8081
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security.web.access: DEBUG
+    org.springframework.security.authentication: DEBUG
+    com.yourcompany.yourapp: DEBUG

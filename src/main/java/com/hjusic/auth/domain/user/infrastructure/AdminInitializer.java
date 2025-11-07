@@ -45,8 +45,9 @@ public class AdminInitializer{
       log.info("Admin user already exists, skipping initialization");
       return;
     }
-
-    var passwordResult = Password.encode(generateSecurePassword(), passwordEncoder);
+    var gneratedPassword = generateSecurePassword();
+    log.warn("Generated default password: {}", gneratedPassword);
+    var passwordResult = Password.encode(gneratedPassword, passwordEncoder);
     if (passwordResult.isLeft()) {
       log.error("Failed to encode default password: {}", passwordResult.getLeft().getMessage());
       return;
