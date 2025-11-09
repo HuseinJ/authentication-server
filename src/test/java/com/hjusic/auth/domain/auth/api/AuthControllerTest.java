@@ -2,6 +2,7 @@ package com.hjusic.auth.domain.auth.api;
 
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
 import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
+import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.service.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,8 @@ class AuthControllerTest {
     // Arrange
     AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
     JwtService jwtService = mock(JwtService.class);
-    AuthController controller = new AuthController(authenticationManager, jwtService);
+    Users users = mock(Users.class);
+    AuthController controller = new AuthController(authenticationManager, users, jwtService);
 
     LoginRequest req = new LoginRequest();
     req.setUsername("alice");

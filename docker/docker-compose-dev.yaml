@@ -77,6 +77,12 @@ services:
     networks:
       - auth-network
 
+  admin-ui:
+    image: ghcr.io/huseinj/my-svelte-app:latest
+    container_name: auth-ui
+    ports:
+      - "3000:3000"
+
 volumes:
   postgres-data:
     driver: local

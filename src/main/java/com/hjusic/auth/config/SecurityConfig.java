@@ -4,6 +4,7 @@ import com.hjusic.auth.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,6 +30,7 @@ public class SecurityConfig {
   private final PasswordEncoder passwordEncoder;
 
   @Bean
+  @Order(3)
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
@@ -38,7 +40,9 @@ public class SecurityConfig {
             .requestMatchers(
                 "/v3/api-docs/**",          // OpenAPI docs (JSON)
                 "/swagger-ui/**",           // Swagger UI resources
-                "/swagger-ui.html"          // optional redirect support
+                "/swagger-ui.html",
+                "/oauth2/**",
+                "/.well-known/**"
             ).permitAll()
             .requestMatchers("/v3/api-docs").permitAll()
             .anyRequest().authenticated()

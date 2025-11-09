@@ -142,7 +142,6 @@ public class UserAppRepository implements Users {
     resetPasswordProcessDatabaseRepository.save(resetPasswordProcesStarted);
 
     return userMapper.toModelObject(user);
-
   }
 
   private User handle(UserDeletedEvent e) {
@@ -156,10 +155,13 @@ public class UserAppRepository implements Users {
   }
 
   private User handle(UserCreatedEvent event) {
+    var roles = roleDatabaseEntityRepository.findAllByNameIn(event.getRoles());
+
     var userDatabaseEntity = UserDatabaseEntity.builder()
         .email(event.getEmail().getValue())
         .username(event.getUsername().getValue())
         .password(event.getPassword().getValue())
+        .roles(roles)
         .build();
 
     return userMapper.toModelObject(userRepository.save(userDatabaseEntity));

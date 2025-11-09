@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.user.api;
 
+import com.hjusic.auth.domain.auth.model.Auth;
 import com.hjusic.auth.domain.user.api.dto.ChangePasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.CompleteResetPasswordRequest;
 import com.hjusic.auth.domain.user.api.dto.CreateUserRequest;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final Users users;
+  private final Auth auth;
   private final CreateUser createUser;
   private final DeleteUser deleteUser;
   private final ResetPasswordProcess resetPasswordProcess;
@@ -43,6 +45,16 @@ public class UserController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public Collection<User> getUsers() {
     return users.findAll();
+  }
+
+  @GetMapping("/me")
+  public User getCurrentUser() {
+    var user = auth.findLoggedInUser();
+    if(user.isLeft()) {
+      throw new IllegalStateException("User is not authenticated");
+    }
+
+    return user.get();
   }
 
   @GetMapping("/{username}")
