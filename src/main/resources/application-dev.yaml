@@ -24,6 +24,7 @@ spring:
         spring.json.trusted.packages: '*'
 
 auth:
+  ui: "http://localhost:3000"
   cors:
     allowed-origins:
       - "http://localhost:3000"
@@ -78,11 +79,3 @@ jwt:
 # Server Configuration
 server:
   port: 8081
-
-logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.security.web.access: DEBUG
-    org.springframework.security.authentication: DEBUG
-    com.yourcompany.yourapp: DEBUG
