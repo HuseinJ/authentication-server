@@ -195,7 +195,7 @@ class JwtServiceTest {
     String issuer = jwtService.extractClaim(token, claims -> claims.getIssuer());
 
     // Then
-    assertThat(issuer).isEqualTo("test-auth-service");
+    assertThat(issuer).isEqualTo("http://localhost:8081");
   }
 
   @Test

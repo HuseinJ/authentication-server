@@ -10,6 +10,10 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 auth:
+  ui: "http://localhost:3000"
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
   admin:
     username: "admin"
     email: "admin@test.com"

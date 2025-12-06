@@ -37,9 +37,6 @@ public class PasswordEncoderConfig {
     encoders.put("scrypt", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
     encoders.put("pbkdf2", Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8());
 
-    DelegatingPasswordEncoder delegatingEncoder =
-        new DelegatingPasswordEncoder("argon2", encoders);
-
-    return delegatingEncoder;
+    return new DelegatingPasswordEncoder("argon2", encoders);
   }
 }
