@@ -1,7 +1,7 @@
 package com.hjusic.auth.domain.oidc.model;
 
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientCreatedEvent;
-import com.hjusic.auth.domain.client.model.event.OAuthClientUpdatedEvent;
+import com.hjusic.auth.domain.oidc.model.events.OAuthClientUpdatedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientDeletedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientSecretRegeneratedEvent;
 import com.hjusic.auth.domain.oidc.model.valueObjects.ClientId;
@@ -114,7 +114,7 @@ public class OAuthClient {
         .clientIdIssuedAt(Instant.now())
         .build();
 
-    return Either.right(new OAuthClientCreatedEvent(client, clientSecret.getPlainText()));
+    return Either.right(OAuthClientCreatedEvent.of(client, clientSecret.getPlainText()));
   }
 
   public Either<OAuthClientError, OAuthClientUpdatedEvent> update(
@@ -159,16 +159,16 @@ public class OAuthClient {
     this.tokenSettings = tokenSettings;
     this.clientSettings = clientSettings;
 
-    return Either.right(new com.hjusic.auth.domain.client.model.event.OAuthClientUpdatedEvent(this));
+    return Either.right(OAuthClientUpdatedEvent.of(this));
   }
 
   public OAuthClientSecretRegeneratedEvent regenerateSecret() {
     var newSecret = ClientSecret.generate();
     this.clientSecret = newSecret;
-    return new OAuthClientSecretRegeneratedEvent(this, newSecret.getPlainText());
+    return OAuthClientSecretRegeneratedEvent.of(this, newSecret.getPlainText());
   }
 
   public OAuthClientDeletedEvent delete() {
-    return new OAuthClientDeletedEvent(this.id, this.clientId);
+    return OAuthClientDeletedEvent.of(this);
   }
 }

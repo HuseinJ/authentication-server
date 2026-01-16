@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientCreatedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientDeletedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientSecretRegeneratedEvent;
-import com.hjusic.auth.domain.client.model.event.OAuthClientUpdatedEvent;
+import com.hjusic.auth.domain.oidc.model.events.OAuthClientUpdatedEvent;
 import com.hjusic.auth.domain.oidc.model.valueObjects.*;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
@@ -351,8 +351,8 @@ class OAuthClientTest {
 
       OAuthClientDeletedEvent event = client.delete();
 
-      assertThat(event.getId()).isEqualTo(client.getId());
-      assertThat(event.getClientId()).isEqualTo(client.getClientId());
+      assertThat(event.getClient().getId()).isEqualTo(client.getId());
+      assertThat(event.getClient().getClientId()).isEqualTo(client.getClientId());
     }
   }
 }
