@@ -1,6 +1,6 @@
 package com.hjusic.auth.domain.oidc.model.events;
 
-import com.hjusic.auth.domain.oidc.model.OAuthClient;
+import com.hjusic.auth.domain.oidc.model.OidcClient;
 import com.hjusic.auth.event.model.DomainEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class OidcClientEvent extends DomainEvent {
-  private OAuthClient client;
+  private OidcClient client;
 }

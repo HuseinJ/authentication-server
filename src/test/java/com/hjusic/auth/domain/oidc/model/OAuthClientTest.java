@@ -21,11 +21,11 @@ import java.util.Set;
 
 class OAuthClientTest {
 
-  private OAuthClients clients;
+  private OidcClients clients;
 
   @BeforeEach
   void setUp() {
-    clients = mock(OAuthClients.class);
+    clients = mock(OidcClients.class);
     when(clients.findByClientId(anyString())).thenReturn(Option.none());
   }
 
@@ -36,7 +36,7 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should create OAuth client with valid parameters")
     void shouldCreateOAuthClientWithValidParameters() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "my-client-app",
           "My Application",
           Set.of("authorization_code", "refresh_token"),
@@ -61,7 +61,7 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should create OAuth client with minimal OIDC scopes")
     void shouldCreateOAuthClientWithMinimalOidcScopes() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "oidc-client",
           "OIDC Client",
           Set.of("authorization_code"),
@@ -83,9 +83,9 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should fail when client ID already exists")
     void shouldFailWhenClientIdAlreadyExists() {
-      when(clients.findByClientId("existing-client")).thenReturn(Option.of(mock(OAuthClient.class)));
+      when(clients.findByClientId("existing-client")).thenReturn(Option.of(mock(OidcClient.class)));
 
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "existing-client",
           "Existing Client",
           Set.of("authorization_code"),
@@ -105,7 +105,7 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should fail with invalid client ID")
     void shouldFailWithInvalidClientId() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "ab",  // Too short
           "My Application",
           Set.of("authorization_code"),
@@ -125,7 +125,7 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should fail with empty grant types")
     void shouldFailWithEmptyGrantTypes() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "my-client",
           "My Application",
           Set.of(),  // Empty grant types
@@ -145,7 +145,7 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should fail with invalid redirect URI")
     void shouldFailWithInvalidRedirectUri() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result = OidcClient.create(
           "my-client",
           "My Application",
           Set.of("authorization_code"),
@@ -164,14 +164,14 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should generate unique client ID for each creation")
     void shouldGenerateUniqueClientId() {
-      Either<OAuthClientError, OAuthClientCreatedEvent> result1 = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result1 = OidcClient.create(
           "client-1", "Client 1",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost/cb1"), Set.of(), Set.of("openid"),
           TokenSettings.defaults(), ClientSettings.defaults(), clients
       );
 
-      Either<OAuthClientError, OAuthClientCreatedEvent> result2 = OAuthClient.create(
+      Either<OAuthClientError, OAuthClientCreatedEvent> result2 = OidcClient.create(
           "client-2", "Client 2",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost/cb2"), Set.of(), Set.of("openid"),
@@ -187,11 +187,11 @@ class OAuthClientTest {
   @DisplayName("OAuth Client update")
   class OAuthClientUpdateTests {
 
-    private OAuthClient existingClient;
+    private OidcClient existingClient;
 
     @BeforeEach
     void setUp() {
-      var createResult = OAuthClient.create(
+      var createResult = OidcClient.create(
           "test-client", "Test Client",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost:8080/callback"), Set.of(),
@@ -297,14 +297,14 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should regenerate client secret")
     void shouldRegenerateClientSecret() {
-      var createResult = OAuthClient.create(
+      var createResult = OidcClient.create(
           "test-client", "Test Client",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost:8080/callback"), Set.of(),
           Set.of("openid"), TokenSettings.defaults(), ClientSettings.defaults(),
           clients
       );
-      OAuthClient client = createResult.get().getClient();
+      OidcClient client = createResult.get().getClient();
       String originalSecret = createResult.get().getPlainTextSecret();
 
       OAuthClientSecretRegeneratedEvent event = client.regenerateSecret();
@@ -317,14 +317,14 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should update client with new secret")
     void shouldUpdateClientWithNewSecret() {
-      var createResult = OAuthClient.create(
+      var createResult = OidcClient.create(
           "test-client", "Test Client",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost:8080/callback"), Set.of(),
           Set.of("openid"), TokenSettings.defaults(), ClientSettings.defaults(),
           clients
       );
-      OAuthClient client = createResult.get().getClient();
+      OidcClient client = createResult.get().getClient();
       ClientSecret originalClientSecret = client.getClientSecret();
 
       client.regenerateSecret();
@@ -340,14 +340,14 @@ class OAuthClientTest {
     @Test
     @DisplayName("Should create deletion event")
     void shouldCreateDeletionEvent() {
-      var createResult = OAuthClient.create(
+      var createResult = OidcClient.create(
           "test-client", "Test Client",
           Set.of("authorization_code"), Set.of("client_secret_basic"),
           Set.of("http://localhost:8080/callback"), Set.of(),
           Set.of("openid"), TokenSettings.defaults(), ClientSettings.defaults(),
           clients
       );
-      OAuthClient client = createResult.get().getClient();
+      OidcClient client = createResult.get().getClient();
 
       OAuthClientDeletedEvent event = client.delete();
 

@@ -1,6 +1,6 @@
 package com.hjusic.auth.domain.oidc.model.events;
 
-import com.hjusic.auth.domain.oidc.model.OAuthClient;
+import com.hjusic.auth.domain.oidc.model.OidcClient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class OAuthClientDeletedEvent extends OidcClientEvent{
 
-  public static OAuthClientDeletedEvent of(OAuthClient client) {
+  public static OAuthClientDeletedEvent of(OidcClient client) {
       var event = new OAuthClientDeletedEvent();
       event.setClient(client);
       return event;

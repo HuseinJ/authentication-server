@@ -22,7 +22,7 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(of = {"id"})
-public class OAuthClient {
+public class OidcClient {
 
   private OAuthClientId id;
   private ClientId clientId;
@@ -47,7 +47,7 @@ public class OAuthClient {
       Set<String> scopes,
       TokenSettings tokenSettings,
       ClientSettings clientSettings,
-      OAuthClients clients) {
+      OidcClients clients) {
 
     // Validate clientId format
     var validatedClientId = ClientId.of(clientId);
@@ -99,7 +99,7 @@ public class OAuthClient {
     // Generate client secret
     var clientSecret = ClientSecret.generate();
 
-    var client = OAuthClient.builder()
+    var client = OidcClient.builder()
         .id(OAuthClientId.generate())
         .clientId(validatedClientId.get())
         .clientSecret(clientSecret)
