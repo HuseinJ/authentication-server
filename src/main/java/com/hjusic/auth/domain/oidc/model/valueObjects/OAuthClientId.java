@@ -1,5 +1,7 @@
 package com.hjusic.auth.domain.oidc.model.valueObjects;
 
+import com.hjusic.auth.domain.oidc.model.OAuthClientError;
+import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -19,8 +21,17 @@ public class OAuthClientId {
     return new OAuthClientId(id);
   }
 
-  public static OAuthClientId of(String id) {
-    return new OAuthClientId(UUID.fromString(id));
+  public static Either<OAuthClientError, OAuthClientId> of(String id) {
+
+    if (id == null || id.isBlank()) {
+      return Either.left(OAuthClientError.validationFailed("OAuth Client ID cannot be empty"));
+    }
+
+    try {
+      return Either.right(new OAuthClientId(UUID.fromString(id)));
+    } catch (IllegalArgumentException e) {
+      return Either.left(OAuthClientError.validationFailed("Invalid OAuth Client ID format: " + id));
+    }
   }
 }
 

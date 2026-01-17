@@ -6,21 +6,22 @@ import lombok.Value;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientSecret {
   String encodedValue;
-  String plainText; // Only available at creation/regeneration time
+  String plainText;
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  public static ClientSecret generate() {
+  public static ClientSecret generate(PasswordEncoder passwordEncoder) {
     byte[] secretBytes = new byte[32];
     SECURE_RANDOM.nextBytes(secretBytes);
     String plainText = Base64.getUrlEncoder().withoutPadding().encodeToString(secretBytes);
-    // The encoded value will be set by the repository when saving (using PasswordEncoder)
-    return new ClientSecret(null, plainText);
+    String encodedValue = passwordEncoder.encode(plainText);
+    return new ClientSecret(encodedValue, plainText);
   }
 
   public static ClientSecret fromEncoded(String encodedValue) {

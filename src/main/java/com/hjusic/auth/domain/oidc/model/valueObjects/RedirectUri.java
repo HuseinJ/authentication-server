@@ -20,15 +20,36 @@ public class RedirectUri {
     if (uri == null || uri.isBlank()) {
       return Either.left(OAuthClientError.validationFailed("Redirect URI cannot be empty"));
     }
+
+    URI parsed;
     try {
-      URI parsed = new URI(uri);
+      parsed = new URI(uri);
       if (parsed.getScheme() == null) {
         return Either.left(OAuthClientError.validationFailed("Redirect URI must have a scheme: " + uri));
       }
     } catch (URISyntaxException e) {
       return Either.left(OAuthClientError.validationFailed("Invalid redirect URI: " + uri));
     }
+
+    String scheme = parsed.getScheme().toLowerCase();
+    if (!scheme.equals("http") && !scheme.equals("https")) {
+      return Either.left(OAuthClientError.validationFailed("Redirect URI must use http or https scheme: " + uri));
+    }
+
+    if (scheme.equals("http") && !isLocalhost(parsed.getHost())) {
+      return Either.left(OAuthClientError.validationFailed("Non-localhost redirect URI must use https: " + uri));
+    }
+
     return Either.right(new RedirectUri(uri));
+  }
+
+  private static boolean isLocalhost(String host) {
+    if (host == null) {
+      return false;
+    }
+    return host.equalsIgnoreCase("localhost")
+        || host.equals("127.0.0.1")
+        || host.equals("::1");
   }
 
   public static Either<OAuthClientError, Set<RedirectUri>> ofSet(Set<String> uris) {

@@ -12,11 +12,11 @@ import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
 import com.hjusic.auth.domain.oidc.model.valueObjects.RedirectUri;
 import com.hjusic.auth.domain.oidc.model.valueObjects.Scope;
 import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
-import io.vavr.control.Either;
 import lombok.*;
 
 import java.time.Instant;
 import java.util.Set;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Data
@@ -37,135 +37,59 @@ public class OidcClient {
   private ClientSettings clientSettings;
   private Instant clientIdIssuedAt;
 
-  public static Either<OAuthClientError, OAuthClientCreatedEvent> create(
-      String clientId,
-      String clientName,
-      Set<String> grantTypes,
-      Set<String> authenticationMethods,
-      Set<String> redirectUris,
-      Set<String> postLogoutRedirectUris,
-      Set<String> scopes,
+  public static OAuthClientCreatedEvent create(
+      ClientId clientId,
+      ClientName clientName,
+      Set<AuthorizationGrantType> grantTypes,
+      Set<ClientAuthenticationMethod> authenticationMethods,
+      Set<RedirectUri> redirectUris,
+      Set<RedirectUri> postLogoutRedirectUris,
+      Set<Scope> scopes,
       TokenSettings tokenSettings,
       ClientSettings clientSettings,
-      OidcClients clients) {
-
-    // Validate clientId format
-    var validatedClientId = ClientId.of(clientId);
-    if (validatedClientId.isLeft()) {
-      return Either.left(validatedClientId.getLeft());
-    }
-
-    // Check if client already exists
-    if (clients.findByClientId(clientId).isDefined()) {
-      return Either.left(OAuthClientError.clientAlreadyExists(clientId));
-    }
-
-    // Validate client name
-    var validatedClientName = ClientName.of(clientName);
-    if (validatedClientName.isLeft()) {
-      return Either.left(validatedClientName.getLeft());
-    }
-
-    // Validate grant types
-    var validatedGrantTypes = AuthorizationGrantType.ofSet(grantTypes);
-    if (validatedGrantTypes.isLeft()) {
-      return Either.left(validatedGrantTypes.getLeft());
-    }
-
-    // Validate authentication methods
-    var validatedAuthMethods = ClientAuthenticationMethod.ofSet(authenticationMethods);
-    if (validatedAuthMethods.isLeft()) {
-      return Either.left(validatedAuthMethods.getLeft());
-    }
-
-    // Validate redirect URIs
-    var validatedRedirectUris = RedirectUri.ofSet(redirectUris);
-    if (validatedRedirectUris.isLeft()) {
-      return Either.left(validatedRedirectUris.getLeft());
-    }
-
-    // Validate post-logout redirect URIs
-    var validatedPostLogoutUris = RedirectUri.ofSet(postLogoutRedirectUris);
-    if (validatedPostLogoutUris.isLeft()) {
-      return Either.left(validatedPostLogoutUris.getLeft());
-    }
-
-    // Validate scopes
-    var validatedScopes = Scope.ofSet(scopes);
-    if (validatedScopes.isLeft()) {
-      return Either.left(validatedScopes.getLeft());
-    }
-
-    // Generate client secret
-    var clientSecret = ClientSecret.generate();
+      ClientSecret clientSecret) {
 
     var client = OidcClient.builder()
         .id(OAuthClientId.generate())
-        .clientId(validatedClientId.get())
+        .clientId(clientId)
         .clientSecret(clientSecret)
-        .clientName(validatedClientName.get())
-        .grantTypes(validatedGrantTypes.get())
-        .authenticationMethods(validatedAuthMethods.get())
-        .redirectUris(validatedRedirectUris.get())
-        .postLogoutRedirectUris(validatedPostLogoutUris.get())
-        .scopes(validatedScopes.get())
+        .clientName(clientName)
+        .grantTypes(grantTypes)
+        .authenticationMethods(authenticationMethods)
+        .redirectUris(redirectUris)
+        .postLogoutRedirectUris(postLogoutRedirectUris)
+        .scopes(scopes)
         .tokenSettings(tokenSettings)
         .clientSettings(clientSettings)
         .clientIdIssuedAt(Instant.now())
         .build();
 
-    return Either.right(OAuthClientCreatedEvent.of(client, clientSecret.getPlainText()));
+    return OAuthClientCreatedEvent.of(client, clientSecret.getPlainText());
   }
 
-  public Either<OAuthClientError, OAuthClientUpdatedEvent> update(
-      String clientName,
-      Set<String> grantTypes,
-      Set<String> redirectUris,
-      Set<String> postLogoutRedirectUris,
-      Set<String> scopes,
+  public OAuthClientUpdatedEvent update(
+      ClientName clientName,
+      Set<AuthorizationGrantType> grantTypes,
+      Set<RedirectUri> redirectUris,
+      Set<RedirectUri> postLogoutRedirectUris,
+      Set<Scope> scopes,
       TokenSettings tokenSettings,
       ClientSettings clientSettings) {
 
-    var validatedClientName = ClientName.of(clientName);
-    if (validatedClientName.isLeft()) {
-      return Either.left(validatedClientName.getLeft());
-    }
-
-    var validatedGrantTypes = AuthorizationGrantType.ofSet(grantTypes);
-    if (validatedGrantTypes.isLeft()) {
-      return Either.left(validatedGrantTypes.getLeft());
-    }
-
-    var validatedRedirectUris = RedirectUri.ofSet(redirectUris);
-    if (validatedRedirectUris.isLeft()) {
-      return Either.left(validatedRedirectUris.getLeft());
-    }
-
-    var validatedPostLogoutUris = RedirectUri.ofSet(postLogoutRedirectUris);
-    if (validatedPostLogoutUris.isLeft()) {
-      return Either.left(validatedPostLogoutUris.getLeft());
-    }
-
-    var validatedScopes = Scope.ofSet(scopes);
-    if (validatedScopes.isLeft()) {
-      return Either.left(validatedScopes.getLeft());
-    }
-
-    this.clientName = validatedClientName.get();
-    this.grantTypes = validatedGrantTypes.get();
-    this.redirectUris = validatedRedirectUris.get();
-    this.postLogoutRedirectUris = validatedPostLogoutUris.get();
-    this.scopes = validatedScopes.get();
+    this.clientName = clientName;
+    this.grantTypes = grantTypes;
+    this.redirectUris = redirectUris;
+    this.postLogoutRedirectUris = postLogoutRedirectUris;
+    this.scopes = scopes;
     this.tokenSettings = tokenSettings;
     this.clientSettings = clientSettings;
 
-    return Either.right(OAuthClientUpdatedEvent.of(this));
+    return OAuthClientUpdatedEvent.of(this);
   }
 
-  public OAuthClientSecretRegeneratedEvent regenerateSecret() {
-    var newSecret = ClientSecret.generate();
-    this.clientSecret = newSecret;
-    return OAuthClientSecretRegeneratedEvent.of(this, newSecret.getPlainText());
+  public OAuthClientSecretRegeneratedEvent regenerateSecret(PasswordEncoder passwordEncoder) {
+    this.clientSecret = ClientSecret.generate(passwordEncoder);
+    return OAuthClientSecretRegeneratedEvent.of(this, clientSecret);
   }
 
   public OAuthClientDeletedEvent delete() {

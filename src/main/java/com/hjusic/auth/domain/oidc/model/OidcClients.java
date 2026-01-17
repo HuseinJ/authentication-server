@@ -1,20 +1,20 @@
 package com.hjusic.auth.domain.oidc.model;
 
+import com.hjusic.auth.domain.oidc.model.events.OidcClientEvent;
+import com.hjusic.auth.domain.oidc.model.valueObjects.ClientId;
 import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
-import io.vavr.control.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OidcClients {
 
-  OidcClient save(OidcClient client);
-
-  Option<OidcClient> findById(OAuthClientId id);
-
-  Option<OidcClient> findByClientId(String clientId);
-
   List<OidcClient> findAll();
 
-  void delete(OidcClient client);
+  Optional<OidcClient> findById(OAuthClientId id);
+
+  Optional<OidcClient> findByClientId(ClientId clientId);
+
+  OidcClient trigger(OidcClientEvent event);
 }
 
