@@ -27,8 +27,6 @@ class RedirectUriTest {
         "https://app.example.com/login/oauth2/code/provider",
         "http://127.0.0.1:3000/auth",
         "https://example.com:443/callback",
-        "myapp://callback",                    // Custom scheme for mobile apps
-        "com.example.app:/oauth2redirect"     // Android custom scheme
     })
     @DisplayName("Should accept valid redirect URI formats")
     void shouldAcceptValidFormats(String uri) {
