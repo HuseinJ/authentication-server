@@ -57,7 +57,7 @@ public class OidcClientAppRepository implements OidcClients {
   }
 
   private OidcClient handle(OAuthClientUpdatedEvent e) {
-    var existingEntity = oidcClientDatabaseRepository.findById(e.getClient().getId().toString())
+    var existingEntity = oidcClientDatabaseRepository.findById(e.getClient().getId().getValue().toString())
         .orElseThrow(() -> new IllegalArgumentException("OIDC Client not found: " + e.getClient().getId()));
 
     OidcClientMapper.updateEntity(existingEntity, e.getClient());
@@ -66,7 +66,7 @@ public class OidcClientAppRepository implements OidcClients {
   }
 
   private OidcClient handle(OAuthClientSecretRegeneratedEvent e) {
-    var existingEntity = oidcClientDatabaseRepository.findById(e.getClient().getId().toString())
+    var existingEntity = oidcClientDatabaseRepository.findById(e.getClient().getId().getValue().toString())
         .orElseThrow(() -> new IllegalArgumentException("OIDC Client not found: " + e.getClient().getId()));
 
     existingEntity.setClientSecret(e.getClient().getClientSecret().getEncodedValue());
@@ -75,7 +75,7 @@ public class OidcClientAppRepository implements OidcClients {
   }
 
   private OidcClient handle(OAuthClientDeletedEvent e) {
-    oidcClientDatabaseRepository.deleteById(e.getClient().getId().toString());
+    oidcClientDatabaseRepository.deleteById(e.getClient().getId().getValue().toString());
     return e.getClient();
   }
 

@@ -4,7 +4,6 @@ import com.hjusic.auth.domain.oidc.application.CreateOidcClient;
 import com.hjusic.auth.domain.oidc.application.DeleteOidcClient;
 import com.hjusic.auth.domain.oidc.application.RegenerateOidcClientSecret;
 import com.hjusic.auth.domain.oidc.application.UpdateOidcClient;
-import com.hjusic.auth.domain.oidc.model.OidcClient;
 import com.hjusic.auth.domain.oidc.model.OidcClients;
 import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class OidcClientController {
 
     var client = oidcClients.findById(validatedId.get());
     if (client.isEmpty()) {
-      return ResponseEntity.badRequest().body(Map.of("error", "OIDC Client not found: " + id));
+      return ResponseEntity.notFound().build();
     }
 
     return ResponseEntity.ok(client.get());

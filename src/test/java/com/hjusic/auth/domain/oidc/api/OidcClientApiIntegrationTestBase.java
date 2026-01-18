@@ -96,6 +96,6 @@ public abstract class OidcClientApiIntegrationTestBase extends BaseIntegrationTe
         .clientIdIssuedAt(Instant.now())
         .build();
 
-    oidcClientRepository.save(existingClient);
+    existingClient = oidcClientRepository.save(existingClient);
   }
 }
