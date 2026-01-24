@@ -31,20 +31,13 @@ public class SecurityConfig {
 
   @Bean
   @Order(3)
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
     http
+        .securityMatcher("/api/**")
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/user/password-reset/**").permitAll()
-            .requestMatchers(
-                "/v3/api-docs/**",          // OpenAPI docs (JSON)
-                "/swagger-ui/**",           // Swagger UI resources
-                "/swagger-ui.html",
-                "/oauth2/**",
-                "/.well-known/**"
-            ).permitAll()
-            .requestMatchers("/v3/api-docs").permitAll()
             .anyRequest().authenticated()
         )
         .sessionManagement(session -> session
@@ -52,6 +45,25 @@ public class SecurityConfig {
         )
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+  }
+
+  @Bean
+  @Order(4)
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/v3/api-docs",
+                "/actuator/**"
+            ).permitAll()
+            .anyRequest().authenticated()
+        )
+        .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
   }
@@ -69,5 +81,4 @@ public class SecurityConfig {
       throws Exception {
     return config.getAuthenticationManager();
   }
-
 }

@@ -60,42 +60,47 @@ public abstract class OidcClientApiIntegrationTestBase extends BaseIntegrationTe
     var adminRole = roleDatabaseRepository.findByName(RoleName.ROLE_ADMIN).get();
     var guestRole = roleDatabaseRepository.findByName(RoleName.ROLE_GUEST).get();
 
-    admin = UserDatabaseEntity.builder()
-        .username("admin")
-        .email("admin@example.com")
-        .roles(Set.of(adminRole))
-        .password(passwordEncoder.encode("password123"))
-        .build();
+    if (userRepository.findByUsername("admin").isEmpty()) {
+      admin = UserDatabaseEntity.builder()
+          .username("admin")
+          .email("admin@example.com")
+          .roles(Set.of(adminRole))
+          .password(passwordEncoder.encode("password123"))
+          .build();
+      userRepository.save(admin);
+    }
 
-    user = UserDatabaseEntity.builder()
-        .username("user")
-        .email("user@example.com")
-        .roles(Set.of(guestRole))
-        .password(passwordEncoder.encode("password123"))
-        .build();
+    if (userRepository.findByUsername("user").isEmpty()) {
+      user = UserDatabaseEntity.builder()
+          .username("user")
+          .email("user@example.com")
+          .roles(Set.of(guestRole))
+          .password(passwordEncoder.encode("password123"))
+          .build();
+      userRepository.save(user);
+    }
 
-    userRepository.save(user);
-    userRepository.save(admin);
 
-    existingClient = OidcClientDatabaseEntity.builder()
-        .id(UUID.randomUUID().toString())
-        .clientId("test-client")
-        .clientSecret("hashed-secret")
-        .clientName("Test Client")
-        .grantTypes(Set.of("authorization_code", "refresh_token"))
-        .authenticationMethods(Set.of("client_secret_basic"))
-        .redirectUris(Set.of("https://example.com/callback"))
-        .postLogoutRedirectUris(Set.of("https://example.com/logout"))
-        .scopes(Set.of("openid", "profile"))
-        .accessTokenTimeToLiveSeconds(3600L)
-        .refreshTokenTimeToLiveSeconds(86400L)
-        .authorizationCodeTimeToLiveSeconds(300L)
-        .reuseRefreshTokens(false)
-        .requireProofKey(false)
-        .requireAuthorizationConsent(true)
-        .clientIdIssuedAt(Instant.now())
-        .build();
-
-    existingClient = oidcClientRepository.save(existingClient);
+    if (oidcClientRepository.findByClientId("test-client").isEmpty()){
+      existingClient = OidcClientDatabaseEntity.builder()
+          .id(UUID.randomUUID().toString())
+          .clientId("test-client")
+          .clientSecret(passwordEncoder.encode("test-secret"))
+          .clientName("Test Client")
+          .grantTypes(Set.of("authorization_code", "refresh_token"))
+          .authenticationMethods(Set.of("client_secret_basic"))
+          .redirectUris(Set.of("https://example.com/callback"))
+          .postLogoutRedirectUris(Set.of("https://example.com/logout"))
+          .scopes(Set.of("openid", "profile"))
+          .accessTokenTimeToLiveSeconds(3600L)
+          .refreshTokenTimeToLiveSeconds(86400L)
+          .authorizationCodeTimeToLiveSeconds(300L)
+          .reuseRefreshTokens(false)
+          .requireProofKey(false)
+          .requireAuthorizationConsent(true)
+          .clientIdIssuedAt(Instant.now())
+          .build();
+      existingClient = oidcClientRepository.save(existingClient);
+    }
   }
 }

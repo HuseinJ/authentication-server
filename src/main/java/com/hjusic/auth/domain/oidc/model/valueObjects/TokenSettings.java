@@ -21,7 +21,12 @@ public class TokenSettings {
   boolean reuseRefreshTokens = false;
 
   public static TokenSettings defaults() {
-    return TokenSettings.builder().build();
+    return TokenSettings.builder()
+        .accessTokenTimeToLive(Duration.ofSeconds(3600L))        // 1 hour
+        .refreshTokenTimeToLive(Duration.ofSeconds(86400L))      // 24 hours
+        .authorizationCodeTimeToLive(Duration.ofSeconds(300L))   // 5 minutes
+        .reuseRefreshTokens(false)
+        .build();
   }
 }
 
