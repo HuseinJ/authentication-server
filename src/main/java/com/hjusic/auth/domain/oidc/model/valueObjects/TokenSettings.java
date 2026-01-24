@@ -1,12 +1,16 @@
 package com.hjusic.auth.domain.oidc.model.valueObjects;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.time.Duration;
 
 @Value
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenSettings {
   @Builder.Default
   Duration accessTokenTimeToLive = Duration.ofHours(1);
