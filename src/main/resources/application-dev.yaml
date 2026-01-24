@@ -28,9 +28,11 @@ auth:
   cors:
     allowed-origins:
       - "http://localhost:3000"
+      - "http://localhost:5173/"
   admin:
     username: "admin"
     email: "admin@test.com"
+  issuer-uri: "http://localhost:8081"
 
 jwt:
   private-key: |

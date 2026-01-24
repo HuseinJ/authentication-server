@@ -17,3 +17,10 @@ auth:
   admin:
     username: "admin"
     email: "admin@test.com"
+  issuer-uri: "http://localhost"
+#logging:
+#  level:
+#    org:
+#      springframework:
+#       security: TRACE
+#        oauth2: DEBUG
