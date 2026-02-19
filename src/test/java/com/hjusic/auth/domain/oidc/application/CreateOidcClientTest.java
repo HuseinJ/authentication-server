@@ -1,5 +1,7 @@
 package com.hjusic.auth.domain.oidc.application;
 
+import com.hjusic.auth.domain.oidc.api.ClientSettingsRequest;
+import com.hjusic.auth.domain.oidc.api.TokenSettingsRequest;
 import com.hjusic.auth.domain.oidc.model.OAuthClientError;
 import com.hjusic.auth.domain.oidc.model.OidcClient;
 import com.hjusic.auth.domain.oidc.model.OidcClients;
@@ -44,8 +46,8 @@ class CreateOidcClientTest {
   private Set<String> redirectUris;
   private Set<String> postLogoutRedirectUris;
   private Set<String> scopes;
-  private TokenSettings tokenSettings;
-  private ClientSettings clientSettings;
+  private TokenSettingsRequest tokenSettings;
+  private ClientSettingsRequest clientSettings;
 
   @BeforeEach
   void setUp() {
@@ -56,8 +58,13 @@ class CreateOidcClientTest {
     redirectUris = Set.of("https://example.com/callback");
     postLogoutRedirectUris = Set.of("https://example.com/logout");
     scopes = Set.of("openid", "profile");
-    tokenSettings = TokenSettings.defaults();
-    clientSettings = ClientSettings.defaults();
+    tokenSettings =
+        TokenSettingsRequest.builder().reuseRefreshTokens(false)
+            .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+            .accessTokenTimeToLiveSeconds(100).build();
+
+    clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+        .requireProofKey(false).build();
   }
 
   @Nested

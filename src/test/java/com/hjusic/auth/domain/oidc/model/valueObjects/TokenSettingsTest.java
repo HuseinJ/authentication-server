@@ -15,7 +15,7 @@ class TokenSettingsTest {
     TokenSettings settings = TokenSettings.defaults();
 
     assertThat(settings.getAccessTokenTimeToLive()).isEqualTo(Duration.ofHours(1));
-    assertThat(settings.getRefreshTokenTimeToLive()).isEqualTo(Duration.ofDays(7));
+    assertThat(settings.getRefreshTokenTimeToLive()).isEqualTo(Duration.ofDays(1));
     assertThat(settings.getAuthorizationCodeTimeToLive()).isEqualTo(Duration.ofMinutes(5));
     assertThat(settings.isReuseRefreshTokens()).isFalse();
   }

@@ -1,13 +1,19 @@
 package com.hjusic.auth.domain.oidc.model.valueObjects;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.time.Duration;
 
 @Value
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TokenSettings {
+
   @Builder.Default
   Duration accessTokenTimeToLive = Duration.ofHours(1);
 
@@ -20,8 +26,19 @@ public class TokenSettings {
   @Builder.Default
   boolean reuseRefreshTokens = false;
 
+  public static TokenSettings of(Duration accessTokenTimeToLive, Duration refreshTokenTimeToLive,
+      Duration authorizationCodeTimeToLive, boolean reuseRefreshTokens) {
+    return new TokenSettings(accessTokenTimeToLive, refreshTokenTimeToLive,
+        authorizationCodeTimeToLive, reuseRefreshTokens);
+  }
+
   public static TokenSettings defaults() {
-    return TokenSettings.builder().build();
+    return TokenSettings.builder()
+        .accessTokenTimeToLive(Duration.ofSeconds(3600L))        // 1 hour
+        .refreshTokenTimeToLive(Duration.ofSeconds(86400L))      // 24 hours
+        .authorizationCodeTimeToLive(Duration.ofSeconds(300L))   // 5 minutes
+        .reuseRefreshTokens(false)
+        .build();
   }
 }
 
