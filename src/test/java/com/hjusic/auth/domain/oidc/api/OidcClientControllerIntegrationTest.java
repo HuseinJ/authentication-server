@@ -130,6 +130,14 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     void createClientAsAdmin() throws Exception {
       String adminToken = jwtService.generateToken(admin);
 
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
+
       var request = CreateOidcClientRequest.builder()
           .clientId("new-client")
           .clientName("New Client")
@@ -138,8 +146,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("https://newclient.com/callback"))
           .postLogoutRedirectUris(Set.of("https://newclient.com/logout"))
           .scopes(Set.of("openid", "profile"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -150,13 +158,22 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .andExpect(jsonPath("$.client").exists())
           .andExpect(jsonPath("$.client.clientId.value").value("new-client"))
           .andExpect(jsonPath("$.clientSecret").exists())
-          .andExpect(jsonPath("$.message").value("Store the client secret securely. It will not be shown again."));
+          .andExpect(jsonPath("$.message").value(
+              "Store the client secret securely. It will not be shown again."));
     }
 
     @Test
     @DisplayName("with duplicate client id returns 400")
     void createClientWithDuplicateIdReturns400() throws Exception {
       String adminToken = jwtService.generateToken(admin);
+
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
 
       var request = CreateOidcClientRequest.builder()
           .clientId("test-client")
@@ -166,8 +183,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("https://duplicate.com/callback"))
           .postLogoutRedirectUris(Set.of("https://duplicate.com/logout"))
           .scopes(Set.of("openid"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -183,6 +200,14 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     void createClientWithInvalidRedirectUriReturns400() throws Exception {
       String adminToken = jwtService.generateToken(admin);
 
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
+
       var request = CreateOidcClientRequest.builder()
           .clientId("invalid-client")
           .clientName("Invalid Client")
@@ -191,8 +216,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("http://example.com/callback"))
           .postLogoutRedirectUris(Set.of("https://example.com/logout"))
           .scopes(Set.of("openid"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -208,6 +233,14 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     void createClientWithInvalidGrantTypeReturns400() throws Exception {
       String adminToken = jwtService.generateToken(admin);
 
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
+
       var request = CreateOidcClientRequest.builder()
           .clientId("invalid-client")
           .clientName("Invalid Client")
@@ -216,8 +249,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("https://example.com/callback"))
           .postLogoutRedirectUris(Set.of("https://example.com/logout"))
           .scopes(Set.of("openid"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -231,6 +264,15 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("without authentication returns 403")
     void createClientWithoutAuthReturns403() throws Exception {
+
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
+
       var request = CreateOidcClientRequest.builder()
           .clientId("new-client")
           .clientName("New Client")
@@ -239,8 +281,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("https://newclient.com/callback"))
           .postLogoutRedirectUris(Set.of("https://newclient.com/logout"))
           .scopes(Set.of("openid"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -254,6 +296,14 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     void createClientAsNonAdminReturns403() throws Exception {
       String userToken = jwtService.generateToken(user);
 
+      var tokenSettings =
+          TokenSettingsRequest.builder().reuseRefreshTokens(false)
+              .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
+              .accessTokenTimeToLiveSeconds(100).build();
+
+      var clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
+          .requireProofKey(false).build();
+
       var request = CreateOidcClientRequest.builder()
           .clientId("new-client")
           .clientName("New Client")
@@ -262,8 +312,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .redirectUris(Set.of("https://newclient.com/callback"))
           .postLogoutRedirectUris(Set.of("https://newclient.com/logout"))
           .scopes(Set.of("openid"))
-          .tokenSettings(TokenSettings.defaults())
-          .clientSettings(ClientSettings.defaults())
+          .tokenSettings(tokenSettings)
+          .clientSettings(clientSettings)
           .build();
 
       mockMvc.perform(post("/api/oidc/clients")
@@ -464,7 +514,8 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.client").exists())
           .andExpect(jsonPath("$.clientSecret").exists())
-          .andExpect(jsonPath("$.message").value("Store the new client secret securely. It will not be shown again."));
+          .andExpect(jsonPath("$.message").value(
+              "Store the new client secret securely. It will not be shown again."));
     }
 
     @Test

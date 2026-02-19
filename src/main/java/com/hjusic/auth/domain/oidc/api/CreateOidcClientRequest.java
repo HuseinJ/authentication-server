@@ -1,7 +1,5 @@
 package com.hjusic.auth.domain.oidc.api;
 
-import com.hjusic.auth.domain.oidc.model.valueObjects.ClientSettings;
-import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +20,6 @@ public class CreateOidcClientRequest {
   private Set<String> redirectUris;
   private Set<String> postLogoutRedirectUris;
   private Set<String> scopes;
-  private TokenSettings tokenSettings;
-  private ClientSettings clientSettings;
+  private TokenSettingsRequest tokenSettings;
+  private ClientSettingsRequest clientSettings;
 }
