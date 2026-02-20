@@ -16,6 +16,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -25,6 +27,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.security.KeyFactory;
@@ -34,6 +37,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.UUID;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
@@ -48,6 +52,9 @@ public class AuthorizationServerConfig {
   @Value("${jwt.public-key}")
   private String publicKeyPem;
 
+  @Value("${auth.ui}")
+  private String uiBaseUrl;
+
   private final OidcUserInfoMapper oidcUserInfoMapper;
 
   private final JpaRegisteredClientRepository jpaRegisteredClientRepository;
@@ -55,6 +62,8 @@ public class AuthorizationServerConfig {
   private final JpaOAuth2AuthorizationService authorizationService;
 
   private final JpaOAuth2AuthorizationConsentService authorizationConsentService;
+
+  private final CorsConfigurationSource corsConfigurationSource;
 
   @Bean
   @Order(1)
@@ -80,7 +89,7 @@ public class AuthorizationServerConfig {
         )
         .exceptionHandling(exceptions -> exceptions
             .defaultAuthenticationEntryPointFor(
-                new LoginUrlAuthenticationEntryPoint("/login"),
+                new LoginUrlAuthenticationEntryPoint(uiBaseUrl + "/login?flow=oidc"),
                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
             )
         )
@@ -93,19 +102,23 @@ public class AuthorizationServerConfig {
   @Order(2)
   public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
     http
-        .securityMatcher("/login", "/logout", "/error", "/css/**", "/js/**", "/images/**")
+        .securityMatcher("/oauth2/login", "/logout", "/error")
+        .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(authorize -> authorize
             .anyRequest().permitAll()
         )
         .formLogin(form -> form
-            .loginPage("/login")
+            .loginProcessingUrl("/oauth2/login")  // frontend POSTs credentials here
+            .successHandler(new SavedRequestAwareAuthenticationSuccessHandler()) // resumes oauth2 flow
+            .failureHandler((request, response, exception) ->
+                response.sendRedirect(uiBaseUrl + "/login?flow=oidc&error=true")
+            )
             .permitAll()
         )
-        .logout(logout -> logout
-            .logoutSuccessUrl("/login?logout")
-            .permitAll()
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         )
-        .csrf(Customizer.withDefaults());
+        .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
   }
