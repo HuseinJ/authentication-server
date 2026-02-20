@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.role.infrastructure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ public class RoleDatabaseEntity {
   @Column(length = 500)
   private String description;
 
+  @JsonIgnore
   @ManyToMany(mappedBy = "roles")
   @Builder.Default
   private Set<UserDatabaseEntity> users = new HashSet<>();
