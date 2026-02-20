@@ -63,16 +63,21 @@ public class AuthorizationServerConfig {
     http.setSharedObject(OAuth2AuthorizationService.class, authorizationService);
     http.setSharedObject(OAuth2AuthorizationConsentService.class, authorizationConsentService);
 
-    OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-
-    http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-        .oidc(oidc -> oidc
-            .userInfoEndpoint(userInfo -> userInfo
-                .userInfoMapper(oidcUserInfoMapper)
-            )
-        );
+    OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+        OAuth2AuthorizationServerConfigurer.authorizationServer();
 
     http
+        .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+        .with(authorizationServerConfigurer, authorizationServer -> authorizationServer
+            .oidc(oidc -> oidc
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userInfoMapper(oidcUserInfoMapper)
+                )
+            )
+        )
+        .authorizeHttpRequests(authorize -> authorize
+            .anyRequest().authenticated()
+        )
         .exceptionHandling(exceptions -> exceptions
             .defaultAuthenticationEntryPointFor(
                 new LoginUrlAuthenticationEntryPoint("/login"),
