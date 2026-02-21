@@ -102,7 +102,7 @@ public class AuthorizationServerConfig {
   @Order(3)
   public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
     http
-        .securityMatcher("/oauth2/login", "/logout", "/error")
+        .securityMatcher("/oauth2/login", "/logout", "/connect/logout", "/error")
         .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(authorize -> authorize
             .anyRequest().permitAll()
