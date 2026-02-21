@@ -99,7 +99,7 @@ public class AuthorizationServerConfig {
   }
 
   @Bean
-  @Order(2)
+  @Order(3)
   public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .securityMatcher("/oauth2/login", "/logout", "/error")
@@ -117,6 +117,23 @@ public class AuthorizationServerConfig {
         )
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        )
+        .csrf(AbstractHttpConfigurer::disable);
+
+    return http.build();
+  }
+
+  @Bean
+  @Order(2)
+  public SecurityFilterChain userinfoEmailsFilterChain(HttpSecurity http) throws Exception {
+    http
+        .securityMatcher("/userinfo/emails")
+        .authorizeHttpRequests(auth -> auth
+            .anyRequest().authenticated()
+        )
+        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .csrf(AbstractHttpConfigurer::disable);
 

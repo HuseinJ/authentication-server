@@ -30,7 +30,7 @@ public class SecurityConfig {
   private final PasswordEncoder passwordEncoder;
 
   @Bean
-  @Order(3)
+  @Order(4)
   public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .securityMatcher("/api/**")
@@ -50,7 +50,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  @Order(4)
+  @Order(5)
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
