@@ -20,7 +20,6 @@ public class CorsConfig {
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
-    log.warn("Initializing CORS Configuration");
 
     List<String> allowedOrigins = corsProperties.getAllowedOrigins();
 

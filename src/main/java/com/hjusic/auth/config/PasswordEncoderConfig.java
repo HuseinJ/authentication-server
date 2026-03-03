@@ -20,8 +20,8 @@ public class PasswordEncoderConfig {
     int saltLength = 16;        // Salt length in bytes
     int hashLength = 32;        // Hash length in bytes
     int parallelism = 1;        // Number of parallel threads
-    int memory = 65536;         // Memory cost in KB (64 MB)
-    int iterations = 3;         // Number of iterations
+    int memory = 19456;         // Memory cost in KB (64 MB)
+    int iterations = 2;         // Number of iterations
 
     Argon2PasswordEncoder argon2Encoder = new Argon2PasswordEncoder(
         saltLength,

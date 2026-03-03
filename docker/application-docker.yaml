@@ -28,6 +28,7 @@ auth:
   cors:
     allowed-origins:
       - "https://ui.authenticator.com"
+      - "http://localhost:5173"
   admin:
     username: "admin"
     email: "admin@test.com"

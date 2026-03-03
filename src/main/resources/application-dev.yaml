@@ -1,12 +1,8 @@
 spring:
-  application:
-    name: auth-service
-
   datasource:
     url: jdbc:postgresql://localhost:5432/authdb
     username: authuser
     password: authpass
-    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -16,23 +12,6 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9094
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: true
-        spring.json.trusted.packages: '*'
-
-auth:
-  ui: "http://localhost:5173"
-  cors:
-    allowed-origins:
-      - "http://localhost:3000"
-      - "http://localhost:5173/"
-  admin:
-    username: "admin"
-    email: "admin@test.com"
-  issuer-uri: "http://localhost:8081"
 
 jwt:
   private-key: |
@@ -87,3 +66,14 @@ server:
     key-store-password: changeit
     key-store-type: PKCS12
     key-alias: testing-authenticator
+
+auth:
+  ui: "http://localhost:5173"
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:5173/"
+  admin:
+    username: "admin"
+    email: "admin@test.com"
+  issuer-uri: "https://testing.autheticator.com"
