@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.oidc.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public enum ClientAuthenticationMethod {
   PRIVATE_KEY_JWT("private_key_jwt"),
   NONE("none");
 
+  @JsonValue
   private final String value;
 
   public static Either<OAuthClientError, ClientAuthenticationMethod> of(String value) {

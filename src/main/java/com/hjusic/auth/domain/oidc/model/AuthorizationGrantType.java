@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.oidc.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public enum AuthorizationGrantType {
   REFRESH_TOKEN("refresh_token"),
   DEVICE_CODE("urn:ietf:params:oauth:grant-type:device_code");
 
+  @JsonValue
   private final String value;
 
   public static Either<OAuthClientError, AuthorizationGrantType> of(String value) {
