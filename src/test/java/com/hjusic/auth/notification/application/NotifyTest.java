@@ -66,7 +66,7 @@ class NotifyTest {
     @Test
     @DisplayName("should return Right with published notification")
     void shouldReturnRightWithPublishedNotification() {
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(VALID_RECIPIENT, VALID_CONTENT);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(VALID_RECIPIENT, VALID_CONTENT);
 
       assertThat(result.isRight()).isTrue();
       assertThat(result.get()).isEqualTo(returnedNotification);
@@ -75,7 +75,7 @@ class NotifyTest {
     @Test
     @DisplayName("should publish NotificationSent event")
     void shouldPublishNotificationSentEvent() {
-      notifyEmail.sendNotifiaction(VALID_RECIPIENT, VALID_CONTENT);
+      notifyEmail.sendNotification(VALID_RECIPIENT, VALID_CONTENT);
 
       verify(notifications).publish(any(NotificationSent.class));
     }
@@ -83,7 +83,7 @@ class NotifyTest {
     @Test
     @DisplayName("should create notification with correct recipient")
     void shouldCreateNotificationWithCorrectRecipient() {
-      notifyEmail.sendNotifiaction(VALID_RECIPIENT, VALID_CONTENT);
+      notifyEmail.sendNotification(VALID_RECIPIENT, VALID_CONTENT);
 
       verify(notifications).publish(notificationEventCaptor.capture());
       NotificationSent capturedEvent = notificationEventCaptor.getValue();
@@ -95,7 +95,7 @@ class NotifyTest {
     @Test
     @DisplayName("should create notification with EMAIL type")
     void shouldCreateNotificationWithEmailType() {
-      notifyEmail.sendNotifiaction(VALID_RECIPIENT, VALID_CONTENT);
+      notifyEmail.sendNotification(VALID_RECIPIENT, VALID_CONTENT);
 
       verify(notifications).publish(any(NotificationSent.class));
     }
@@ -103,7 +103,7 @@ class NotifyTest {
     @Test
     @DisplayName("should create notification with correct sender")
     void shouldCreateNotificationWithCorrectSender() {
-      notifyEmail.sendNotifiaction(VALID_RECIPIENT, VALID_CONTENT);
+      notifyEmail.sendNotification(VALID_RECIPIENT, VALID_CONTENT);
 
       verify(notifications).publish(notificationEventCaptor.capture());
       NotificationSent capturedEvent = notificationEventCaptor.getValue();
@@ -121,7 +121,7 @@ class NotifyTest {
     @ValueSource(strings = {"   ", "\t", "\n"})
     @DisplayName("should return Left with RECIPIENT_INVALID error")
     void shouldReturnLeftWithRecipientInvalidError(String invalidRecipient) {
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(invalidRecipient, VALID_CONTENT);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(invalidRecipient, VALID_CONTENT);
 
       assertThat(result.isLeft()).isTrue();
       NotificationError error = result.getLeft();
@@ -134,7 +134,7 @@ class NotifyTest {
     @ValueSource(strings = {"   ", "\t", "\n"})
     @DisplayName("should not publish notification when recipient is blank")
     void shouldNotPublishNotificationWhenRecipientIsBlank(String invalidRecipient) {
-      notifyEmail.sendNotifiaction(invalidRecipient, VALID_CONTENT);
+      notifyEmail.sendNotification(invalidRecipient, VALID_CONTENT);
 
       verify(notifications, never()).publish(any(NotificationSent.class));
     }
@@ -149,7 +149,7 @@ class NotifyTest {
     @ValueSource(strings = {"   ", "\t", "\n"})
     @DisplayName("should return Left with BODY_EMPTY error")
     void shouldReturnLeftWithBodyEmptyError(String invalidContent) {
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(VALID_RECIPIENT, invalidContent);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(VALID_RECIPIENT, invalidContent);
 
       assertThat(result.isLeft()).isTrue();
       NotificationError error = result.getLeft();
@@ -162,7 +162,7 @@ class NotifyTest {
     @ValueSource(strings = {"   ", "\t", "\n"})
     @DisplayName("should not publish notification when content is blank")
     void shouldNotPublishNotificationWhenContentIsBlank(String invalidContent) {
-      notifyEmail.sendNotifiaction(VALID_RECIPIENT, invalidContent);
+      notifyEmail.sendNotification(VALID_RECIPIENT, invalidContent);
 
       verify(notifications, never()).publish(any(NotificationSent.class));
     }
@@ -175,7 +175,7 @@ class NotifyTest {
     @Test
     @DisplayName("should return Left with RECIPIENT_INVALID error (validates recipient first)")
     void shouldReturnRecipientInvalidError() {
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction("", "");
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification("", "");
 
       assertThat(result.isLeft()).isTrue();
       NotificationError error = result.getLeft();
@@ -185,7 +185,7 @@ class NotifyTest {
     @Test
     @DisplayName("should not publish notification")
     void shouldNotPublishNotification() {
-      notifyEmail.sendNotifiaction("", "");
+      notifyEmail.sendNotification("", "");
 
       verify(notifications, never()).publish(any(NotificationSent.class));
     }
@@ -208,7 +208,7 @@ class NotifyTest {
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);
 
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(longRecipient, VALID_CONTENT);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(longRecipient, VALID_CONTENT);
 
       assertThat(result.isRight()).isTrue();
       verify(notifications).publish(any(NotificationSent.class));
@@ -227,7 +227,7 @@ class NotifyTest {
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);
 
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(VALID_RECIPIENT, longContent);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(VALID_RECIPIENT, longContent);
 
       assertThat(result.isRight()).isTrue();
       verify(notifications).publish(any(NotificationSent.class));
@@ -246,7 +246,7 @@ class NotifyTest {
       );
       when(notifications.publish(any(NotificationSent.class))).thenReturn(mockNotification);
 
-      Either<NotificationError, Notification> result = notifyEmail.sendNotifiaction(VALID_RECIPIENT, specialContent);
+      Either<NotificationError, Notification> result = notifyEmail.sendNotification(VALID_RECIPIENT, specialContent);
 
       assertThat(result.isRight()).isTrue();
       verify(notifications).publish(any(NotificationSent.class));

@@ -1,7 +1,7 @@
 package com.hjusic.auth.jwt.filter;
 
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseRepository;
-import com.hjusic.auth.service.JwtService;
+import com.hjusic.auth.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

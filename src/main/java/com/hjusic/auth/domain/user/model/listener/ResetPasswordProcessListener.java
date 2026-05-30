@@ -20,7 +20,7 @@ public class ResetPasswordProcessListener {
 
   @EventListener
   private void initiateResetPasswordProcessNotification(ResetPasswordProcessStartedEvent event) {
-    notifyEmail.sendNotifiaction(event.getEmail().getValue(), "Reset passwort process started use the following token: " + UI_URL + "/reset?token=" + event.getResetPasswordToken().getValue() + "&username=" + event.getUsername().getValue());
+    notifyEmail.sendNotification(event.getEmail().getValue(), "Reset passwort process started use the following token: " + UI_URL + "/reset?token=" + event.getResetPasswordToken().getValue() + "&username=" + event.getUsername().getValue());
     log.info("Reset password process notification sent to email: {}", event.getEmail());
   }
 

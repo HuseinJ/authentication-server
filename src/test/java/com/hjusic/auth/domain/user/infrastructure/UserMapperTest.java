@@ -1,7 +1,7 @@
 package com.hjusic.auth.domain.user.infrastructure;
 
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseEntity;
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.AdminUser;
 import com.hjusic.auth.domain.user.model.GuestUser;

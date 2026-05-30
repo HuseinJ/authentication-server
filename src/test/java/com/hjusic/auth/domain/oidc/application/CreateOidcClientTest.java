@@ -99,7 +99,7 @@ class CreateOidcClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings);
 
-      assertThat(result.get().getClientId().getValue()).isEqualTo(clientId);
+      assertThat(result.get().client().getClientId().getValue()).isEqualTo(clientId);
     }
 
     @Test
@@ -109,7 +109,7 @@ class CreateOidcClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings);
 
-      assertThat(result.get().getClientName().getValue()).isEqualTo(clientName);
+      assertThat(result.get().client().getClientName().getValue()).isEqualTo(clientName);
     }
 
     @Test
@@ -144,7 +144,7 @@ class CreateOidcClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings);
 
-      assertThat(result.get().getClientSecret()).isNotNull();
+      assertThat(result.get().client().getClientSecret()).isNotNull();
     }
 
     @Test
@@ -438,7 +438,7 @@ class CreateOidcClientTest {
           tokenSettings, clientSettings);
 
       assertThat(result.isRight()).isTrue();
-      assertThat(result.get().getRedirectUris()).hasSize(3);
+      assertThat(result.get().client().getRedirectUris()).hasSize(3);
     }
   }
 

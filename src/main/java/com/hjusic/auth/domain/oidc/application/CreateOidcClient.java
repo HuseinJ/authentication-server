@@ -28,7 +28,7 @@ public class CreateOidcClient {
   private final OidcClients clients;
   private final PasswordEncoder passwordEncoder;
 
-  public Either<OAuthClientError, OidcClient> create(
+  public Either<OAuthClientError, CreateOidcClientResult> create(
       String clientId,
       String clientName,
       Set<String> grantTypes,
@@ -94,10 +94,11 @@ public class CreateOidcClient {
         validatedRedirectUris.get(), validatedPostLogoutUris.get(),
         validatedScopes.get(), modelTokenSetting, modelClientSettings, clientSecret);
 
-    var resultClient = clients.trigger(event);
-    resultClient.setClientSecret(clientSecret);
+    var persistedClient = clients.trigger(event);
 
-    return Either.right(resultClient);
+    return Either.right(new CreateOidcClientResult(persistedClient, clientSecret.getPlainText()));
   }
+
+  public record CreateOidcClientResult(OidcClient client, String plainTextSecret) {}
 
 }

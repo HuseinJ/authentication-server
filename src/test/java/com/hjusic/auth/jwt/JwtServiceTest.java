@@ -1,6 +1,6 @@
 package com.hjusic.auth.jwt;
 
-import com.hjusic.auth.service.JwtService;
+import com.hjusic.auth.jwt.JwtService;
 
 import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;

@@ -10,18 +10,24 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: true
-        spring.json.trusted.packages: '*'
+        spring.json.add.type.headers: false
+        spring.json.trusted.packages: 'com.hjusic.auth.notification.model'
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: true
+        same-site: lax
 management:
   server:
     port: 8081
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info,prometheus"
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
     prometheus:
       enabled: true
   metrics:

@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.role.infrastructure;
 
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import java.util.Collection;
 import java.util.List;

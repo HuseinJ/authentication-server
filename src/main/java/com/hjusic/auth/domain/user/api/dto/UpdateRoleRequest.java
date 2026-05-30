@@ -1,6 +1,6 @@
 package com.hjusic.auth.domain.user.api.dto;
 
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import java.util.Set;
 import lombok.Data;
 

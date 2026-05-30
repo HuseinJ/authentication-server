@@ -3,7 +3,7 @@ package com.hjusic.auth.domain.auth.api;
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
 import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
 import com.hjusic.auth.domain.user.model.Users;
-import com.hjusic.auth.service.JwtService;
+import com.hjusic.auth.jwt.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;

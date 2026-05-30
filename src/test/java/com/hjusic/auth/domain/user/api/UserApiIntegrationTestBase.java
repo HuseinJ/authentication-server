@@ -2,7 +2,7 @@ package com.hjusic.auth.domain.user.api;
 
 import com.hjusic.auth.BaseIntegrationTest;
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseRepository;
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.infrastructure.ResetPasswordProcessDatabaseRepository;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseRepository;
@@ -36,7 +36,7 @@ public abstract class UserApiIntegrationTestBase extends BaseIntegrationTest {
   protected PasswordEncoder passwordEncoder;
 
   @Autowired
-  protected com.hjusic.auth.service.JwtService jwtService;
+  protected com.hjusic.auth.jwt.JwtService jwtService;
 
   protected UserDatabaseEntity admin;
   protected UserDatabaseEntity user;

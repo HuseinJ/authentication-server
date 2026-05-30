@@ -1,4 +1,4 @@
-package com.hjusic.auth.service;
+package com.hjusic.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
