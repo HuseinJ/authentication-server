@@ -12,20 +12,19 @@ import io.vavr.control.Either;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Data
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @SuperBuilder
 @EqualsAndHashCode(of = {"username", "email"})
 public abstract class User {
 
-  private Username username;
-  private Email email;
-  private Set<Role> roles;
+  private final Username username;
+  private final Email email;
+  private final Set<Role> roles;
 
   public abstract String getUserType();
 
@@ -48,10 +47,7 @@ public abstract class User {
     throw new IllegalStateException("Potential user does not match current user");
   }
 
-  public Either<UserError, ChangePasswordEvent> changePassword(Password password, String oldPassword, String passwordHash, PasswordEncoder passwordEncoder) {
-    if(passwordEncoder.matches(oldPassword, passwordHash)) {
-      return Either.right(ChangePasswordEvent.of(username, password));
-    }
-    return Either.left(UserError.validationFailed("Old password does not match"));
+  public ChangePasswordEvent changePassword(Password newPassword) {
+    return ChangePasswordEvent.of(username, newPassword);
   }
 }

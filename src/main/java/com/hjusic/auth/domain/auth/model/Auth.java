@@ -5,8 +5,8 @@ import io.vavr.control.Either;
 
 public interface Auth {
 
-  Either<AuthError, String> findPasswordHash();
-
   Either<AuthError, User> findLoggedInUser();
+
+  Either<AuthError, Boolean> matchesCurrentPassword(String plaintext);
 
 }

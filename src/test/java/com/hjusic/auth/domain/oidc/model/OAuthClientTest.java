@@ -287,9 +287,9 @@ class OAuthClientTest {
 
       var passwordEncoder = mock(PasswordEncoder.class);
       when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      existingClient.regenerateSecret(passwordEncoder);
+      var event = existingClient.regenerateSecret(passwordEncoder);
 
-      assertThat(existingClient.getClientSecret()).isNotEqualTo(originalSecret);
+      assertThat(event.getClient().getClientSecret()).isNotEqualTo(originalSecret);
     }
 
     @Test
@@ -309,7 +309,7 @@ class OAuthClientTest {
       var event = existingClient.regenerateSecret(passwordEncoder);
 
       assertThat(event.getClient()).isEqualTo(existingClient);
-      assertThat(event.getClient().getClientSecret()).isEqualTo(existingClient.getClientSecret());
+      assertThat(event.getClient().getClientSecret()).isEqualTo(event.getNewClientSecret());
     }
 
     @Test
@@ -321,12 +321,12 @@ class OAuthClientTest {
 
       var passwordEncoder = mock(PasswordEncoder.class);
       when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      existingClient.regenerateSecret(passwordEncoder);
+      var event = existingClient.regenerateSecret(passwordEncoder);
 
-      assertThat(existingClient.getId()).isEqualTo(originalId);
-      assertThat(existingClient.getClientId()).isEqualTo(originalClientId);
-      assertThat(existingClient.getClientName()).isEqualTo(originalClientName);
-      assertThat(existingClient.getGrantTypes()).isEqualTo(originalGrantTypes);
+      assertThat(event.getClient().getId()).isEqualTo(originalId);
+      assertThat(event.getClient().getClientId()).isEqualTo(originalClientId);
+      assertThat(event.getClient().getClientName()).isEqualTo(originalClientName);
+      assertThat(event.getClient().getGrantTypes()).isEqualTo(originalGrantTypes);
     }
 
     @Test

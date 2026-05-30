@@ -19,22 +19,6 @@ class AuthenticationRepository implements Auth {
   private final Users users;
 
   @Override
-  public Either<AuthError, String> findPasswordHash() {
-    var user = findLoggedInUser();
-    if (user.isLeft()) {
-      return Either.left(AuthError.notAuthenticated());
-    }
-
-    var result = users.findPasswordHash(user.get().getUsername().getValue());
-
-    if(StringUtils.isBlank(result)) {
-      return Either.left(AuthError.notAuthenticated());
-    }
-
-    return Either.right(result);
-  }
-
-  @Override
   public Either<AuthError, User> findLoggedInUser() {
     try {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -52,9 +36,22 @@ class AuthenticationRepository implements Auth {
 
       return Either.right(potentialUser.get());
 
-
     } catch (Exception e) {
       return Either.left(AuthError.notAuthenticated(e.getMessage()));
     }
+  }
+
+  @Override
+  public Either<AuthError, Boolean> matchesCurrentPassword(String plaintext) {
+    if (StringUtils.isBlank(plaintext)) {
+      return Either.right(false);
+    }
+
+    var user = findLoggedInUser();
+    if (user.isLeft()) {
+      return Either.left(AuthError.notAuthenticated());
+    }
+
+    return Either.right(users.matchesPassword(user.get().getUsername().getValue(), plaintext));
   }
 }

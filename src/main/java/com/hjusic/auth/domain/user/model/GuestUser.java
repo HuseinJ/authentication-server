@@ -1,17 +1,18 @@
 package com.hjusic.auth.domain.user.model;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-@Data
+@Getter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class GuestUser extends User{
-private final String USER_TYPE = "GUEST";
+public class GuestUser extends User {
+
+  private static final String USER_TYPE = "GUEST";
 
   @Override
   public String getUserType() {
-    return "GUEST";
+    return USER_TYPE;
   }
 }
