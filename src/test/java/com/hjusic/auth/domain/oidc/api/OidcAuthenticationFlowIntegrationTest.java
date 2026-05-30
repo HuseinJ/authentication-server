@@ -2,7 +2,7 @@ package com.hjusic.auth.domain.oidc.api;
 
 import com.hjusic.auth.domain.oidc.infrastructure.OAuth2AuthorizationJpaRepository;
 import com.hjusic.auth.domain.oidc.infrastructure.OidcClientDatabaseEntity;
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import jakarta.persistence.EntityManager;
 import java.util.concurrent.atomic.AtomicReference;

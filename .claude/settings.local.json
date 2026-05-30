@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/huseinjusic/private/authentication-server log --all --oneline -- \"*.p12\" \"*.key\" \"*.pem\")",
+      "Bash(git -C /Users/huseinjusic/private/authentication-server show 12ac750:src/main/resources/keystore.p12)"
+    ]
+  }
+}

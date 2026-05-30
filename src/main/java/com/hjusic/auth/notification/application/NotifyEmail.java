@@ -16,7 +16,7 @@ public class NotifyEmail {
 
   private final Notifications notifications;
 
-  public Either<NotificationError, Notification> sendNotifiaction(String recipient, String content) {
+  public Either<NotificationError, Notification> sendNotification(String recipient, String content) {
 
     if (StringUtils.isBlank(recipient)) {
       return Either.left(NotificationError.of("Recipient cannot be blank", NotificationErrorCode.RECIPIENT_INVALID));

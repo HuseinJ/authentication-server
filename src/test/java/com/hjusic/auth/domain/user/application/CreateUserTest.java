@@ -2,7 +2,7 @@ package com.hjusic.auth.domain.user.application;
 
 import com.hjusic.auth.domain.auth.model.Auth;
 import com.hjusic.auth.domain.auth.model.AuthError;
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.model.AdminUser;
 import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.UserError;

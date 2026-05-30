@@ -2,7 +2,6 @@ package com.hjusic.auth.domain.auth.infrastructure;
 
 import com.hjusic.auth.domain.auth.model.Auth;
 import com.hjusic.auth.domain.auth.model.AuthError;
-import com.hjusic.auth.domain.user.infrastructure.UserDatabaseRepository;
 import com.hjusic.auth.domain.user.model.User;
 import com.hjusic.auth.domain.user.model.Users;
 import io.vavr.control.Either;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 class AuthenticationRepository implements Auth {
 
   private final Users users;
-  private final UserDatabaseRepository userRepository;
 
   @Override
   public Either<AuthError, String> findPasswordHash() {
@@ -27,7 +25,7 @@ class AuthenticationRepository implements Auth {
       return Either.left(AuthError.notAuthenticated());
     }
 
-    var result = userRepository.findPasswordHashByUsername(user.get().getUsername().getValue());
+    var result = users.findPasswordHash(user.get().getUsername().getValue());
 
     if(StringUtils.isBlank(result)) {
       return Either.left(AuthError.notAuthenticated());

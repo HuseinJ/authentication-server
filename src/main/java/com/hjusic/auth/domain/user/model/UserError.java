@@ -28,7 +28,7 @@ public class UserError {
   }
 
   public static UserError deletionFailed(String message) {
-    return new UserError(message, UserErrorCode.USER_CREATION_FAILED);
+    return new UserError(message, UserErrorCode.USER_DELETION_FAILED);
   }
 
   public static UserError invalidResetPasswordToken(String message) {

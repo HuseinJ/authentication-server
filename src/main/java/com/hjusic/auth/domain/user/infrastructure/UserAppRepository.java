@@ -47,6 +47,11 @@ public class UserAppRepository implements Users {
   }
 
   @Override
+  public String findPasswordHash(String username) {
+    return userRepository.findPasswordHashByUsername(username);
+  }
+
+  @Override
   public Either<UserError, User> validateResetPasswordToken(String username, String token) {
 
     var userEntity = userRepository.findByUsername(username).orElseThrow(

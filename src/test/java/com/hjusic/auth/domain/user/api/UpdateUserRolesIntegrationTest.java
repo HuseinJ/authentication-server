@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hjusic.auth.domain.role.infrastructure.RoleDatabaseRepository;
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.api.dto.UpdateRoleRequest;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import java.util.Set;

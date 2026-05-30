@@ -3,6 +3,7 @@ package com.hjusic.auth.domain.role.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hjusic.auth.BaseIntegrationTest;
+import com.hjusic.auth.domain.role.model.RoleName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

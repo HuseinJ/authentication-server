@@ -60,8 +60,8 @@ public class OidcClientController {
     ).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
         result -> ResponseEntity.ok(Map.of(
-            "client", result,
-            "clientSecret", result.getClientSecret().getPlainText(),
+            "client", result.client(),
+            "clientSecret", result.plainTextSecret(),
             "message", "Store the client secret securely. It will not be shown again."
         ))
     );

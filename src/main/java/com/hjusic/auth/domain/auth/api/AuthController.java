@@ -5,7 +5,7 @@ import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
 import com.hjusic.auth.domain.auth.model.Auth;
 import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.Users;
-import com.hjusic.auth.service.JwtService;
+import com.hjusic.auth.jwt.JwtService;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;

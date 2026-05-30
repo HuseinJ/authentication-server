@@ -1,6 +1,6 @@
 package com.hjusic.auth.domain.user.infrastructure;
 
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
@@ -60,7 +60,7 @@ public class AdminInitializer{
             Set.of(RoleName.ROLE_ADMIN))
     );
 
-    notifyEmail.sendNotifiaction(email, "Admin user created using username: " + username + " and email: " + email);
+    notifyEmail.sendNotification(email, "Admin user created using username: " + username + " and email: " + email);
 
     log.info("Admin user created and notification sent");
   }

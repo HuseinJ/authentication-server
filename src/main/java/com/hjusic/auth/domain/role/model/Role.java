@@ -1,6 +1,6 @@
 package com.hjusic.auth.domain.role.model;
 
-import com.hjusic.auth.domain.role.infrastructure.RoleName;
+import com.hjusic.auth.domain.role.model.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.role.infrastructure;
 
+import com.hjusic.auth.domain.role.model.RoleName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.CommandLineRunner;
