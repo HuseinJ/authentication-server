@@ -10,7 +10,7 @@ public interface Users {
 
   Either<UserError, User> findByUsername(String username);
 
-  String findPasswordHash(String username);
+  boolean matchesPassword(String username, String plaintext);
 
   Either<UserError, User> validateResetPasswordToken(String username, String token);
 

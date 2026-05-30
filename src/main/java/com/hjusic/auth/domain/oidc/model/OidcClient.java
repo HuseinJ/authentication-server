@@ -12,30 +12,34 @@ import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
 import com.hjusic.auth.domain.oidc.model.valueObjects.RedirectUri;
 import com.hjusic.auth.domain.oidc.model.valueObjects.Scope;
 import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Data
-@Builder
+@Getter
+@Builder(toBuilder = true)
 @EqualsAndHashCode(of = {"id"})
 public class OidcClient {
 
-  private OAuthClientId id;
-  private ClientId clientId;
-  private ClientSecret clientSecret;
-  private ClientName clientName;
-  private Set<AuthorizationGrantType> grantTypes;
-  private Set<ClientAuthenticationMethod> authenticationMethods;
-  private Set<RedirectUri> redirectUris;
-  private Set<RedirectUri> postLogoutRedirectUris;
-  private Set<Scope> scopes;
-  private TokenSettings tokenSettings;
-  private ClientSettings clientSettings;
-  private Instant clientIdIssuedAt;
+  private final OAuthClientId id;
+  private final ClientId clientId;
+  private final ClientSecret clientSecret;
+  private final ClientName clientName;
+  private final Set<AuthorizationGrantType> grantTypes;
+  private final Set<ClientAuthenticationMethod> authenticationMethods;
+  private final Set<RedirectUri> redirectUris;
+  private final Set<RedirectUri> postLogoutRedirectUris;
+  private final Set<Scope> scopes;
+  private final TokenSettings tokenSettings;
+  private final ClientSettings clientSettings;
+  private final Instant clientIdIssuedAt;
 
   public static OAuthClientCreatedEvent create(
       ClientId clientId,
@@ -76,20 +80,23 @@ public class OidcClient {
       TokenSettings tokenSettings,
       ClientSettings clientSettings) {
 
-    this.clientName = clientName;
-    this.grantTypes = grantTypes;
-    this.redirectUris = redirectUris;
-    this.postLogoutRedirectUris = postLogoutRedirectUris;
-    this.scopes = scopes;
-    this.tokenSettings = tokenSettings;
-    this.clientSettings = clientSettings;
+    var updated = this.toBuilder()
+        .clientName(clientName)
+        .grantTypes(grantTypes)
+        .redirectUris(redirectUris)
+        .postLogoutRedirectUris(postLogoutRedirectUris)
+        .scopes(scopes)
+        .tokenSettings(tokenSettings)
+        .clientSettings(clientSettings)
+        .build();
 
-    return OAuthClientUpdatedEvent.of(this);
+    return OAuthClientUpdatedEvent.of(updated);
   }
 
   public OAuthClientSecretRegeneratedEvent regenerateSecret(PasswordEncoder passwordEncoder) {
-    this.clientSecret = ClientSecret.generate(passwordEncoder);
-    return OAuthClientSecretRegeneratedEvent.of(this, clientSecret);
+    var newSecret = ClientSecret.generate(passwordEncoder);
+    var updated = this.toBuilder().clientSecret(newSecret).build();
+    return OAuthClientSecretRegeneratedEvent.of(updated, newSecret);
   }
 
   public OAuthClientDeletedEvent delete() {

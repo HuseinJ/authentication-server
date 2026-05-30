@@ -21,34 +21,34 @@ public class ChangePassword {
 
   public Either<UserError, User> changePassword(String oldPassword, String newPassword) {
 
-    if(StringUtils.isBlank(oldPassword)){
+    if (StringUtils.isBlank(oldPassword)) {
       return Either.left(UserError.validationFailed("Old password cannot be empty"));
     }
 
     var potentialPassword = Password.encode(newPassword, passwordEncoder);
 
-    if(potentialPassword.isLeft()) {
+    if (potentialPassword.isLeft()) {
       return Either.left(potentialPassword.getLeft());
     }
 
     var user = auth.findLoggedInUser();
 
-    if(user.isLeft()) {
+    if (user.isLeft()) {
       return Either.left(UserError.creationFailed("User does not exist"));
     }
 
-    var passwordHash = auth.findPasswordHash();
+    var matches = auth.matchesCurrentPassword(oldPassword);
 
-    if(passwordHash.isLeft()) {
+    if (matches.isLeft()) {
       return Either.left(UserError.creationFailed("User does not exist"));
     }
 
-    var event = user.get().changePassword(potentialPassword.get(), oldPassword, passwordHash.get(), passwordEncoder);
-    if(event.isLeft()) {
-      return Either.left(event.getLeft());
+    if (!matches.get()) {
+      return Either.left(UserError.validationFailed("Old password does not match"));
     }
 
-    return Either.right(users.trigger(event.get()));
+    var event = user.get().changePassword(potentialPassword.get());
+    return Either.right(users.trigger(event));
   }
 
 }

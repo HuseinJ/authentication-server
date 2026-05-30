@@ -84,8 +84,11 @@ public class CreateOidcClient {
         Duration.ofSeconds(tokenSettings.getAuthorizationCodeTimeToLiveSeconds()),
         tokenSettings.isReuseRefreshTokens());
 
+    boolean isPublicClient = validatedAuthMethods.get().contains(ClientAuthenticationMethod.NONE);
+    boolean requireProofKey = clientSettings.isRequireProofKey() || isPublicClient;
+
     var modelClientSettings = ClientSettings.of(clientSettings.isRequireAuthorizationConsent(),
-        clientSettings.isRequireProofKey());
+        requireProofKey);
 
     var clientSecret = ClientSecret.generate(passwordEncoder);
 

@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 class ClientSettingsTest {
 
   @Test
-  @DisplayName("Should create client settings with default values")
+  @DisplayName("Should create client settings with secure defaults (PKCE required)")
   void shouldCreateWithDefaults() {
     ClientSettings settings = ClientSettings.defaults();
 
     assertThat(settings.isRequireAuthorizationConsent()).isTrue();
-    assertThat(settings.isRequireProofKey()).isFalse();
+    assertThat(settings.isRequireProofKey()).isTrue();
   }
 
   @Test

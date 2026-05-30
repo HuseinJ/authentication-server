@@ -13,7 +13,7 @@ public class ClientSettings {
   boolean requireAuthorizationConsent = true;
 
   @Builder.Default
-  boolean requireProofKey = false;
+  boolean requireProofKey = true;
 
   public static ClientSettings of(boolean requireAuthorizationConsent, boolean requireProofKey) {
     return ClientSettings.builder().requireAuthorizationConsent(requireAuthorizationConsent)
