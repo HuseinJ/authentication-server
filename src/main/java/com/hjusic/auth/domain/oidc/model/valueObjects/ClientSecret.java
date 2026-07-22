@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.oidc.model.valueObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -8,6 +9,12 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+// A client secret (hash or plaintext) must never be serialized into an API response or onto the
+// event bus. @JsonIgnoreType makes Jackson drop the property wherever a ClientSecret appears
+// (OidcClient.clientSecret, OAuthClient*Event.newClientSecret, ...) instead of emitting an empty
+// bean, which would fail serialization. The one-time plaintext at creation/regeneration is
+// surfaced explicitly as a separate String in the response payload.
+@JsonIgnoreType
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientSecret {

@@ -1,6 +1,7 @@
 package com.hjusic.auth.domain.user.model.event;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hjusic.auth.domain.user.model.ValueObjects.Email;
 import com.hjusic.auth.domain.user.model.ValueObjects.ResetPasswordToken;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
@@ -11,6 +12,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ResetPasswordProcessStartedEvent extends UserEvent {
 
+  // Carries the raw reset token for in-process listeners only; never serialize it to the event bus.
+  @JsonIgnore
   private ResetPasswordToken resetPasswordToken;
 
   public static ResetPasswordProcessStartedEvent of(Username username, Email email, ResetPasswordToken resetPasswordToken) {

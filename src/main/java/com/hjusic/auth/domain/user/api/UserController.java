@@ -71,11 +71,15 @@ public class UserController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public ResponseEntity<?> createUser(@RequestBody CreateUserRequest createUserRequest) {
 
+    Set<String> requestedRoles = createUserRequest.getRoles() == null
+        ? Set.of()
+        : Set.copyOf(createUserRequest.getRoles());
+
     return createUser.create(
         createUserRequest.getUsername(),
         createUserRequest.getEmail(),
         createUserRequest.getPassword(),
-        Set.of()
+        requestedRoles
     ).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
         ResponseEntity::ok

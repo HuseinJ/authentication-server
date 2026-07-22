@@ -3,6 +3,7 @@ package com.hjusic.auth.config;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaOAuth2AuthorizationConsentService;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaOAuth2AuthorizationService;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaRegisteredClientRepository;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -36,7 +37,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.UUID;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -145,10 +145,17 @@ public class AuthorizationServerConfig {
     RSAPublicKey publicKey = parsePublicKey(publicKeyPem);
     RSAPrivateKey privateKey = parsePrivateKey(privateKeyPem);
 
-    RSAKey rsaKey = new RSAKey.Builder(publicKey)
-        .privateKey(privateKey)
-        .keyID(UUID.randomUUID().toString())
-        .build();
+    RSAKey rsaKey;
+    try {
+      // Deterministic key id derived from the key's SHA-256 JWK thumbprint, so the published
+      // `kid` stays stable across restarts (a random UUID per boot invalidates cached JWKS).
+      rsaKey = new RSAKey.Builder(publicKey)
+          .privateKey(privateKey)
+          .keyIDFromThumbprint()
+          .build();
+    } catch (JOSEException e) {
+      throw new IllegalStateException("Failed to derive stable JWK key id", e);
+    }
 
     JWKSet jwkSet = new JWKSet(rsaKey);
     return new ImmutableJWKSet<>(jwkSet);
