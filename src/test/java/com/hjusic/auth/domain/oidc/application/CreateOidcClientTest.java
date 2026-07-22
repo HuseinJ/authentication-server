@@ -1,7 +1,5 @@
 package com.hjusic.auth.domain.oidc.application;
 
-import com.hjusic.auth.domain.oidc.api.ClientSettingsRequest;
-import com.hjusic.auth.domain.oidc.api.TokenSettingsRequest;
 import com.hjusic.auth.domain.oidc.model.OAuthClientError;
 import com.hjusic.auth.domain.oidc.model.OidcClient;
 import com.hjusic.auth.domain.oidc.model.OidcClients;
@@ -20,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Duration;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,8 +45,8 @@ class CreateOidcClientTest {
   private Set<String> redirectUris;
   private Set<String> postLogoutRedirectUris;
   private Set<String> scopes;
-  private TokenSettingsRequest tokenSettings;
-  private ClientSettingsRequest clientSettings;
+  private TokenSettings tokenSettings;
+  private ClientSettings clientSettings;
 
   @BeforeEach
   void setUp() {
@@ -58,13 +57,10 @@ class CreateOidcClientTest {
     redirectUris = Set.of("https://example.com/callback");
     postLogoutRedirectUris = Set.of("https://example.com/logout");
     scopes = Set.of("openid", "profile");
-    tokenSettings =
-        TokenSettingsRequest.builder().reuseRefreshTokens(false)
-            .refreshTokenTimeToLiveSeconds(100).authorizationCodeTimeToLiveSeconds(100)
-            .accessTokenTimeToLiveSeconds(100).build();
+    tokenSettings = TokenSettings.of(
+        Duration.ofSeconds(100), Duration.ofSeconds(100), Duration.ofSeconds(100), false);
 
-    clientSettings = ClientSettingsRequest.builder().requireAuthorizationConsent(false)
-        .requireProofKey(false).build();
+    clientSettings = ClientSettings.of(false, false);
   }
 
   @Nested

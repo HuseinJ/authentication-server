@@ -5,12 +5,15 @@ import com.hjusic.auth.domain.oidc.application.DeleteOidcClient;
 import com.hjusic.auth.domain.oidc.application.RegenerateOidcClientSecret;
 import com.hjusic.auth.domain.oidc.application.UpdateOidcClient;
 import com.hjusic.auth.domain.oidc.model.OidcClients;
+import com.hjusic.auth.domain.oidc.model.valueObjects.ClientSettings;
 import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
+import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -27,7 +30,10 @@ public class OidcClientController {
 
   @GetMapping
   public ResponseEntity<?> getAllClients() {
-    return ResponseEntity.ok(oidcClients.findAll());
+    var clients = oidcClients.findAll().stream()
+        .map(OidcClientResponse::from)
+        .toList();
+    return ResponseEntity.ok(clients);
   }
 
   @GetMapping("/{id}")
@@ -42,11 +48,14 @@ public class OidcClientController {
       return ResponseEntity.notFound().build();
     }
 
-    return ResponseEntity.ok(client.get());
+    return ResponseEntity.ok(OidcClientResponse.from(client.get()));
   }
 
   @PostMapping
   public ResponseEntity<?> createClient(@RequestBody CreateOidcClientRequest request) {
+    var tokenSettings = toTokenSettings(request.getTokenSettings());
+    var clientSettings = toClientSettings(request.getClientSettings());
+
     return createOidcClient.create(
         request.getClientId(),
         request.getClientName(),
@@ -55,16 +64,28 @@ public class OidcClientController {
         request.getRedirectUris(),
         request.getPostLogoutRedirectUris(),
         request.getScopes(),
-        request.getTokenSettings(),
-        request.getClientSettings()
+        tokenSettings,
+        clientSettings
     ).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
         result -> ResponseEntity.ok(Map.of(
-            "client", result.client(),
+            "client", OidcClientResponse.from(result.client()),
             "clientSecret", result.plainTextSecret(),
             "message", "Store the client secret securely. It will not be shown again."
         ))
     );
+  }
+
+  private static TokenSettings toTokenSettings(TokenSettingsRequest request) {
+    return TokenSettings.of(
+        Duration.ofSeconds(request.getAccessTokenTimeToLiveSeconds()),
+        Duration.ofSeconds(request.getRefreshTokenTimeToLiveSeconds()),
+        Duration.ofSeconds(request.getAuthorizationCodeTimeToLiveSeconds()),
+        request.isReuseRefreshTokens());
+  }
+
+  private static ClientSettings toClientSettings(ClientSettingsRequest request) {
+    return ClientSettings.of(request.isRequireAuthorizationConsent(), request.isRequireProofKey());
   }
 
   @PutMapping("/{id}")
@@ -83,7 +104,7 @@ public class OidcClientController {
         request.getClientSettings()
     ).fold(
         error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
-        ResponseEntity::ok
+        updatedClient -> ResponseEntity.ok(OidcClientResponse.from(updatedClient))
     );
   }
 
@@ -102,7 +123,7 @@ public class OidcClientController {
         .fold(
             error -> ResponseEntity.badRequest().body(Map.of("error", error.getMessage())),
             result -> ResponseEntity.ok(Map.of(
-                "client", result.client(),
+                "client", OidcClientResponse.from(result.client()),
                 "clientSecret", result.plainTextSecret(),
                 "message", "Store the new client secret securely. It will not be shown again."
             ))
