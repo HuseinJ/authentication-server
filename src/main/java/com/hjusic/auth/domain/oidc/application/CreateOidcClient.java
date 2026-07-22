@@ -1,7 +1,5 @@
 package com.hjusic.auth.domain.oidc.application;
 
-import com.hjusic.auth.domain.oidc.api.ClientSettingsRequest;
-import com.hjusic.auth.domain.oidc.api.TokenSettingsRequest;
 import com.hjusic.auth.domain.oidc.model.AuthorizationGrantType;
 import com.hjusic.auth.domain.oidc.model.ClientAuthenticationMethod;
 import com.hjusic.auth.domain.oidc.model.OAuthClientError;
@@ -15,7 +13,6 @@ import com.hjusic.auth.domain.oidc.model.valueObjects.RedirectUri;
 import com.hjusic.auth.domain.oidc.model.valueObjects.Scope;
 import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
 import io.vavr.control.Either;
-import java.time.Duration;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,8 +33,8 @@ public class CreateOidcClient {
       Set<String> redirectUris,
       Set<String> postLogoutRedirectUris,
       Set<String> scopes,
-      TokenSettingsRequest tokenSettings,
-      ClientSettingsRequest clientSettings) {
+      TokenSettings tokenSettings,
+      ClientSettings clientSettings) {
 
     var validatedClientId = ClientId.of(clientId);
     if (validatedClientId.isLeft()) {
@@ -78,12 +75,7 @@ public class CreateOidcClient {
       return Either.left(validatedScopes.getLeft());
     }
 
-    var modelTokenSetting = TokenSettings.of(
-        Duration.ofSeconds(tokenSettings.getAccessTokenTimeToLiveSeconds()),
-        Duration.ofSeconds(tokenSettings.getRefreshTokenTimeToLiveSeconds()),
-        Duration.ofSeconds(tokenSettings.getAuthorizationCodeTimeToLiveSeconds()),
-        tokenSettings.isReuseRefreshTokens());
-
+    // PKCE is mandatory for public clients (auth method "none"), regardless of what the caller sent.
     boolean isPublicClient = validatedAuthMethods.get().contains(ClientAuthenticationMethod.NONE);
     boolean requireProofKey = clientSettings.isRequireProofKey() || isPublicClient;
 
@@ -95,7 +87,7 @@ public class CreateOidcClient {
     var event = OidcClient.create(validatedClientId.get(), validatedClientName.get(),
         validatedGrantTypes.get(), validatedAuthMethods.get(),
         validatedRedirectUris.get(), validatedPostLogoutUris.get(),
-        validatedScopes.get(), modelTokenSetting, modelClientSettings, clientSecret);
+        validatedScopes.get(), tokenSettings, modelClientSettings, clientSecret);
 
     var persistedClient = clients.trigger(event);
 
