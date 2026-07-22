@@ -50,11 +50,20 @@ public class CreateUser {
     }
 
     if (loggedInUser.get() instanceof AdminUser admin) {
+      var validatedRoles = new java.util.HashSet<RoleName>();
+      for (String role : roles) {
+        try {
+          validatedRoles.add(RoleName.valueOf(role));
+        } catch (IllegalArgumentException ex) {
+          return Either.left(UserError.creationFailed("Unknown role: " + role));
+        }
+      }
+
       var user = users.trigger(admin.createUser(
           potentialUsername.get(),
           potentialEmail.get(),
           potentialPassword.get(),
-          roles.stream().map(RoleName::valueOf).collect(java.util.stream.Collectors.toSet())
+          validatedRoles
       ));
 
       return Either.right(user);

@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.user.model.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ResetPasswordProcessComplete extends UserEvent {
 
+  @JsonIgnore
   private Password password;
 
   public static ResetPasswordProcessComplete of(Username username, Password password) {
