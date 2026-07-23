@@ -14,8 +14,8 @@ import com.hjusic.auth.domain.oidc.model.valueObjects.Scope;
 import com.hjusic.auth.domain.oidc.model.valueObjects.TokenSettings;
 import io.vavr.control.Either;
 import java.util.Set;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class CreateOidcClient {
 
   private final OidcClients clients;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
 
   public Either<OAuthClientError, CreateOidcClientResult> create(
       String clientId,
@@ -82,7 +82,7 @@ public class CreateOidcClient {
     var modelClientSettings = ClientSettings.of(clientSettings.isRequireAuthorizationConsent(),
         requireProofKey);
 
-    var clientSecret = ClientSecret.generate(passwordEncoder);
+    var clientSecret = ClientSecret.generate(passwordHasher);
 
     var event = OidcClient.create(validatedClientId.get(), validatedClientName.get(),
         validatedGrantTypes.get(), validatedAuthMethods.get(),

@@ -7,8 +7,8 @@ import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class ChangePassword {
 
   private final Auth auth;
   private final Users users;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
 
   public Either<UserError, User> changePassword(String oldPassword, String newPassword) {
 
@@ -25,7 +25,7 @@ public class ChangePassword {
       return Either.left(UserError.validationFailed("Old password cannot be empty"));
     }
 
-    var potentialPassword = Password.encode(newPassword, passwordEncoder);
+    var potentialPassword = Password.encode(newPassword, passwordHasher);
 
     if (potentialPassword.isLeft()) {
       return Either.left(potentialPassword.getLeft());

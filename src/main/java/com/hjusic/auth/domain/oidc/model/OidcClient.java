@@ -1,5 +1,6 @@
 package com.hjusic.auth.domain.oidc.model;
 
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientCreatedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientUpdatedEvent;
 import com.hjusic.auth.domain.oidc.model.events.OAuthClientDeletedEvent;
@@ -20,7 +21,6 @@ import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Set;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -93,8 +93,8 @@ public class OidcClient {
     return OAuthClientUpdatedEvent.of(updated);
   }
 
-  public OAuthClientSecretRegeneratedEvent regenerateSecret(PasswordEncoder passwordEncoder) {
-    var newSecret = ClientSecret.generate(passwordEncoder);
+  public OAuthClientSecretRegeneratedEvent regenerateSecret(PasswordHasher passwordHasher) {
+    var newSecret = ClientSecret.generate(passwordHasher);
     var updated = this.toBuilder().clientSecret(newSecret).build();
     return OAuthClientSecretRegeneratedEvent.of(updated, newSecret);
   }

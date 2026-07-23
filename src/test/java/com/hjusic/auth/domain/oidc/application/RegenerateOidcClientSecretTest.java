@@ -15,7 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +28,7 @@ class RegenerateOidcClientSecretTest {
   private OidcClients clients;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
+  private PasswordHasher passwordHasher;
 
   @InjectMocks
   private RegenerateOidcClientSecret regenerateOidcClientSecret;
@@ -54,7 +54,7 @@ class RegenerateOidcClientSecretTest {
     @BeforeEach
     void setUp() {
       when(clients.findById(any(OAuthClientId.class))).thenReturn(Optional.of(existingClient));
-      when(existingClient.regenerateSecret(passwordEncoder)).thenReturn(regeneratedEvent);
+      when(existingClient.regenerateSecret(passwordHasher)).thenReturn(regeneratedEvent);
       when(regeneratedEvent.getNewClientSecret()).thenReturn(newClientSecret);
       when(newClientSecret.getPlainText()).thenReturn(plainTextSecret);
       when(clients.trigger(any(OAuthClientSecretRegeneratedEvent.class))).thenReturn(existingClient);
@@ -77,10 +77,10 @@ class RegenerateOidcClientSecretTest {
     }
 
     @Test
-    void shouldCallRegenerateSecretOnClientWithPasswordEncoder() {
+    void shouldCallRegenerateSecretOnClientWithPasswordHasher() {
       regenerateOidcClientSecret.regenerate(validId);
 
-      verify(existingClient).regenerateSecret(passwordEncoder);
+      verify(existingClient).regenerateSecret(passwordHasher);
     }
 
     @Test
@@ -188,7 +188,7 @@ class RegenerateOidcClientSecretTest {
     void shouldNotCallRegenerateSecretWhenClientNotFound() {
       regenerateOidcClientSecret.regenerate(validId);
 
-      verify(existingClient, never()).regenerateSecret(any(PasswordEncoder.class));
+      verify(existingClient, never()).regenerateSecret(any(PasswordHasher.class));
     }
   }
 
@@ -210,7 +210,7 @@ class RegenerateOidcClientSecretTest {
       regenerateOidcClientSecret.regenerate(validId);
 
       verify(clients).findById(any(OAuthClientId.class));
-      verify(existingClient, never()).regenerateSecret(any(PasswordEncoder.class));
+      verify(existingClient, never()).regenerateSecret(any(PasswordHasher.class));
     }
   }
 

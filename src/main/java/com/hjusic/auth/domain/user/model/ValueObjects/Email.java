@@ -1,7 +1,6 @@
 package com.hjusic.auth.domain.user.model.ValueObjects;
 
 import com.hjusic.auth.domain.user.model.UserError;
-import io.micrometer.common.util.StringUtils;
 import io.vavr.control.Either;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
@@ -22,7 +21,7 @@ public class Email {
 
   public static Either<UserError, Email> of(String email) {
 
-    if (StringUtils.isBlank(email)) {
+    if (email == null || email.isBlank()) {
       return Either.left(UserError.validationFailed(
           "Email cannot be empty"
       ));

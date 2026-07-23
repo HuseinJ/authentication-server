@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 class ClientSecretTest {
 
@@ -19,9 +19,9 @@ class ClientSecretTest {
     @Test
     @DisplayName("Should generate a non-null secret")
     void shouldGenerateNonNullSecret() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      ClientSecret secret = ClientSecret.generate(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      ClientSecret secret = ClientSecret.generate(passwordHasher);
 
       assertThat(secret).isNotNull();
       assertThat(secret.getPlainText()).isNotNull();
@@ -31,9 +31,9 @@ class ClientSecretTest {
     @Test
     @DisplayName("Should generate secret with sufficient length")
     void shouldGenerateSecretWithSufficientLength() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      ClientSecret secret = ClientSecret.generate(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      ClientSecret secret = ClientSecret.generate(passwordHasher);
 
       // Base64 URL encoding of 32 bytes should be ~43 characters
       assertThat(secret.getPlainText().length()).isGreaterThanOrEqualTo(40);
@@ -42,10 +42,10 @@ class ClientSecretTest {
     @Test
     @DisplayName("Should generate unique secrets")
     void shouldGenerateUniqueSecrets() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      ClientSecret secret1 = ClientSecret.generate(passwordEncoder);
-      ClientSecret secret2 = ClientSecret.generate(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      ClientSecret secret1 = ClientSecret.generate(passwordHasher);
+      ClientSecret secret2 = ClientSecret.generate(passwordHasher);
 
       assertThat(secret1.getPlainText()).isNotEqualTo(secret2.getPlainText());
     }
@@ -68,9 +68,9 @@ class ClientSecretTest {
     @Test
     @DisplayName("Should add encoded value to existing secret")
     void shouldAddEncodedValue() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      ClientSecret originalSecret = ClientSecret.generate(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      ClientSecret originalSecret = ClientSecret.generate(passwordHasher);
       String encodedValue = "$2a$10$encodedSecretHash";
 
       ClientSecret withEncoded = originalSecret.withEncodedValue(encodedValue);

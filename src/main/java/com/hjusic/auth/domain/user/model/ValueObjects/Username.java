@@ -3,13 +3,9 @@ package com.hjusic.auth.domain.user.model.ValueObjects;
 
 import com.hjusic.auth.domain.user.model.UserError;
 import io.vavr.control.Either;
-import io.vavr.control.Validation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import org.springframework.util.StringUtils;
-
-import java.util.function.Predicate;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,7 +25,7 @@ public class Username {
   }
 
   private static Either<UserError, String> validateNotEmpty(String username) {
-    return StringUtils.hasText(username)
+    return username != null && !username.isBlank()
         ? Either.right(username.trim())
         : Either.left(UserError.validationFailed("Username cannot be empty"));
   }

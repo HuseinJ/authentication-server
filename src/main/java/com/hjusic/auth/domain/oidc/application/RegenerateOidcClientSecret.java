@@ -4,8 +4,8 @@ import com.hjusic.auth.domain.oidc.model.OAuthClientError;
 import com.hjusic.auth.domain.oidc.model.OidcClients;
 import com.hjusic.auth.domain.oidc.model.valueObjects.OAuthClientId;
 import io.vavr.control.Either;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class RegenerateOidcClientSecret {
 
   private final OidcClients clients;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
 
   public Either<OAuthClientError, RegenerateSecretResult> regenerate(String id) {
 
@@ -28,7 +28,7 @@ public class RegenerateOidcClientSecret {
     }
 
     var client = existingClient.get();
-    var event = client.regenerateSecret(passwordEncoder);
+    var event = client.regenerateSecret(passwordHasher);
     var updatedClient = clients.trigger(event);
 
     return Either.right(new RegenerateSecretResult(updatedClient, event.getNewClientSecret().getPlainText()));

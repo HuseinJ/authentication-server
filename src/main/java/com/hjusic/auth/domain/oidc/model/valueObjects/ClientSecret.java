@@ -1,13 +1,13 @@
 package com.hjusic.auth.domain.oidc.model.valueObjects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 // A client secret (hash or plaintext) must never be serialized into an API response or onto the
 // event bus. @JsonIgnoreType makes Jackson drop the property wherever a ClientSecret appears
@@ -23,11 +23,11 @@ public class ClientSecret {
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  public static ClientSecret generate(PasswordEncoder passwordEncoder) {
+  public static ClientSecret generate(PasswordHasher passwordHasher) {
     byte[] secretBytes = new byte[32];
     SECURE_RANDOM.nextBytes(secretBytes);
     String plainText = Base64.getUrlEncoder().withoutPadding().encodeToString(secretBytes);
-    String encodedValue = passwordEncoder.encode(plainText);
+    String encodedValue = passwordHasher.hash(plainText);
     return new ClientSecret(encodedValue, plainText);
   }
 
