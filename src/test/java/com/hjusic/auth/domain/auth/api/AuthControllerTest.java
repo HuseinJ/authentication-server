@@ -3,7 +3,7 @@ package com.hjusic.auth.domain.auth.api;
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
 import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
 import com.hjusic.auth.domain.user.model.Users;
-import com.hjusic.auth.jwt.JwtService;
+import com.hjusic.auth.jwt.TokenIssuer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import java.util.List;
 
@@ -24,13 +25,14 @@ import static org.mockito.Mockito.when;
 class AuthControllerTest {
 
   @Test
-  @DisplayName("login authenticates and returns TokenResponse built from JwtService")
+  @DisplayName("login authenticates and returns TokenResponse built from TokenIssuer")
   void loginSuccess() {
     // Arrange
     AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
-    JwtService jwtService = mock(JwtService.class);
+    TokenIssuer tokenIssuer = mock(TokenIssuer.class);
     Users users = mock(Users.class);
-    AuthController controller = new AuthController(authenticationManager, users, jwtService);
+    JwtDecoder jwtDecoder = mock(JwtDecoder.class);
+    AuthController controller = new AuthController(authenticationManager, users, tokenIssuer, jwtDecoder);
 
     LoginRequest req = new LoginRequest();
     req.setUsername("alice");
@@ -43,10 +45,10 @@ class AuthControllerTest {
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
         .thenReturn(auth);
 
-    when(jwtService.generateToken(principal)).thenReturn("access.jwt.token");
-    when(jwtService.generateRefreshToken(principal)).thenReturn("refresh.jwt.token");
-    when(jwtService.getExpirationTime()).thenReturn(3600000L);
-    when(jwtService.getRefreshExpirationTime()).thenReturn(604800000L);
+    when(tokenIssuer.generateToken(principal)).thenReturn("access.jwt.token");
+    when(tokenIssuer.generateRefreshToken(principal)).thenReturn("refresh.jwt.token");
+    when(tokenIssuer.getExpirationTime()).thenReturn(3600000L);
+    when(tokenIssuer.getRefreshExpirationTime()).thenReturn(604800000L);
 
     // Act
     ResponseEntity<TokenResponse> response = controller.login(req);

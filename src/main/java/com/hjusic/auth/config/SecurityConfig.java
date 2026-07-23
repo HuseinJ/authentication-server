@@ -1,6 +1,5 @@
 package com.hjusic.auth.config;
 
-import com.hjusic.auth.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +17,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
@@ -29,7 +29,6 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final JwtAuthenticationFilter jwtAuthFilter;
   private final UserDetailsService userDetailsService;
   private final PasswordEncoder passwordEncoder;
 
@@ -49,9 +48,25 @@ public class SecurityConfig {
         )
         .headers(securityHeaders())
         .authenticationProvider(authenticationProvider())
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        .oauth2ResourceServer(oauth2 -> oauth2
+            .jwt(jwt -> jwt.jwtAuthenticationConverter(apiJwtAuthenticationConverter())));
 
     return http.build();
+  }
+
+  /**
+   * Maps the {@code roles} claim of an access token straight to Spring authorities. The role
+   * values already carry the {@code ROLE_} prefix (e.g. {@code ROLE_ADMIN}), so no extra prefix is
+   * applied — {@code @PreAuthorize("hasAuthority('ROLE_ADMIN')")} matches directly.
+   */
+  private static JwtAuthenticationConverter apiJwtAuthenticationConverter() {
+    JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+    authorities.setAuthoritiesClaimName("roles");
+    authorities.setAuthorityPrefix("");
+
+    JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+    converter.setJwtGrantedAuthoritiesConverter(authorities);
+    return converter;
   }
 
   @Bean

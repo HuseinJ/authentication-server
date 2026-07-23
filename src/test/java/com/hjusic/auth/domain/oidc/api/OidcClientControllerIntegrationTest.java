@@ -28,7 +28,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token returns client list")
     void getAllClientsAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(get("/api/oidc/clients")
               .header("Authorization", "Bearer " + adminToken))
@@ -49,7 +49,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void getAllClientsAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       mockMvc.perform(get("/api/oidc/clients")
               .header("Authorization", "Bearer " + userToken))
@@ -72,7 +72,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token returns client")
     void getClientAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(get("/api/oidc/clients/{id}", existingClient.getId())
               .header("Authorization", "Bearer " + adminToken))
@@ -84,7 +84,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-existent id returns 404")
     void getClientWithNonExistentIdReturns404() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
       String nonExistentId = UUID.randomUUID().toString();
 
       mockMvc.perform(get("/api/oidc/clients/{id}", nonExistentId)
@@ -95,7 +95,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid id format returns 400")
     void getClientWithInvalidIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(get("/api/oidc/clients/{id}", "invalid-uuid")
               .header("Authorization", "Bearer " + adminToken))
@@ -113,7 +113,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void getClientAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       mockMvc.perform(get("/api/oidc/clients/{id}", existingClient.getId())
               .header("Authorization", "Bearer " + userToken))
@@ -128,7 +128,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token creates client and returns secret")
     void createClientAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var tokenSettings =
           TokenSettingsRequest.builder().reuseRefreshTokens(false)
@@ -165,7 +165,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with duplicate client id returns 400")
     void createClientWithDuplicateIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var tokenSettings =
           TokenSettingsRequest.builder().reuseRefreshTokens(false)
@@ -198,7 +198,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid redirect uri returns 400")
     void createClientWithInvalidRedirectUriReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var tokenSettings =
           TokenSettingsRequest.builder().reuseRefreshTokens(false)
@@ -231,7 +231,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid grant type returns 400")
     void createClientWithInvalidGrantTypeReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var tokenSettings =
           TokenSettingsRequest.builder().reuseRefreshTokens(false)
@@ -294,7 +294,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void createClientAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       var tokenSettings =
           TokenSettingsRequest.builder().reuseRefreshTokens(false)
@@ -331,7 +331,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token updates client")
     void updateClientAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var request = UpdateOidcClientRequest.builder()
           .clientName("Updated Client Name")
@@ -354,7 +354,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-existent id returns 400")
     void updateClientWithNonExistentIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
       String nonExistentId = UUID.randomUUID().toString();
 
       var request = UpdateOidcClientRequest.builder()
@@ -378,7 +378,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid redirect uri returns 400")
     void updateClientWithInvalidRedirectUriReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       var request = UpdateOidcClientRequest.builder()
           .clientName("Updated Client Name")
@@ -420,7 +420,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void updateClientAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       var request = UpdateOidcClientRequest.builder()
           .clientName("Updated Client Name")
@@ -447,7 +447,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token deletes client")
     void deleteClientAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(delete("/api/oidc/clients/{id}", existingClient.getId())
               .header("Authorization", "Bearer " + adminToken))
@@ -462,7 +462,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-existent id returns 400")
     void deleteClientWithNonExistentIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
       String nonExistentId = UUID.randomUUID().toString();
 
       mockMvc.perform(delete("/api/oidc/clients/{id}", nonExistentId)
@@ -474,7 +474,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid id format returns 400")
     void deleteClientWithInvalidIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(delete("/api/oidc/clients/{id}", "invalid-uuid")
               .header("Authorization", "Bearer " + adminToken))
@@ -492,7 +492,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void deleteClientAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       mockMvc.perform(delete("/api/oidc/clients/{id}", existingClient.getId())
               .header("Authorization", "Bearer " + userToken))
@@ -507,7 +507,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with admin token regenerates secret")
     void regenerateSecretAsAdmin() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(post("/api/oidc/clients/{id}/regenerate-secret", existingClient.getId())
               .header("Authorization", "Bearer " + adminToken))
@@ -521,7 +521,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-existent id returns 400")
     void regenerateSecretWithNonExistentIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
       String nonExistentId = UUID.randomUUID().toString();
 
       mockMvc.perform(post("/api/oidc/clients/{id}/regenerate-secret", nonExistentId)
@@ -533,7 +533,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with invalid id format returns 400")
     void regenerateSecretWithInvalidIdReturns400() throws Exception {
-      String adminToken = jwtService.generateToken(admin);
+      String adminToken = tokenIssuer.generateToken(admin);
 
       mockMvc.perform(post("/api/oidc/clients/{id}/regenerate-secret", "invalid-uuid")
               .header("Authorization", "Bearer " + adminToken))
@@ -551,7 +551,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     @Test
     @DisplayName("with non-admin token returns 403")
     void regenerateSecretAsNonAdminReturns403() throws Exception {
-      String userToken = jwtService.generateToken(user);
+      String userToken = tokenIssuer.generateToken(user);
 
       mockMvc.perform(post("/api/oidc/clients/{id}/regenerate-secret", existingClient.getId())
               .header("Authorization", "Bearer " + userToken))

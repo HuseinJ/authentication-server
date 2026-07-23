@@ -106,7 +106,7 @@ class PasswordResetIntegrationTest extends UserApiIntegrationTestBase {
         List.of()
     );
 
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(post("/api/user")
             .header("Authorization", "Bearer " + adminToken)
@@ -170,7 +170,7 @@ class PasswordResetIntegrationTest extends UserApiIntegrationTestBase {
         List.of()
     );
 
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(post("/api/user")
             .header("Authorization", "Bearer " + adminToken)

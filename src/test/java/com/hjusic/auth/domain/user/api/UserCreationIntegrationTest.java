@@ -18,7 +18,7 @@ class UserCreationIntegrationTest extends UserApiIntegrationTestBase{
   @Test
   @DisplayName("POST /api/user with admin token creates user successfully")
   void createUserAsAdmin() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     CreateUserRequest request = new CreateUserRequest(
         "boba",
@@ -43,7 +43,7 @@ class UserCreationIntegrationTest extends UserApiIntegrationTestBase{
   @Test
   @DisplayName("POST /api/user with user token failed")
   void createUserAsGuest() throws Exception {
-    String adminToken = jwtService.generateToken(user);
+    String adminToken = tokenIssuer.generateToken(user);
 
     CreateUserRequest request = new CreateUserRequest(
         "luke",

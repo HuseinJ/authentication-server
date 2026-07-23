@@ -2,10 +2,9 @@ package com.hjusic.auth.domain.auth.api;
 
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
 import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
-import com.hjusic.auth.domain.auth.model.Auth;
 import com.hjusic.auth.domain.role.model.Role;
 import com.hjusic.auth.domain.user.model.Users;
-import com.hjusic.auth.jwt.JwtService;
+import com.hjusic.auth.jwt.TokenIssuer;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +29,8 @@ public class AuthController {
 
   private final AuthenticationManager authenticationManager;
   private final Users users;
-  private final JwtService jwtService;
+  private final TokenIssuer tokenIssuer;
+  private final JwtDecoder jwtDecoder;
 
   @PostMapping("/login")
   public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
@@ -38,22 +39,22 @@ public class AuthController {
     );
 
     UserDetails user = (UserDetails) authentication.getPrincipal();
-    String token = jwtService.generateToken(user);
-    String refreshToken = jwtService.generateRefreshToken(user);
+    String token = tokenIssuer.generateToken(user);
+    String refreshToken = tokenIssuer.generateRefreshToken(user);
 
-    return ResponseEntity.ok(new TokenResponse(token, refreshToken, jwtService.getExpirationTime(),
-        jwtService.getRefreshExpirationTime()));
+    return ResponseEntity.ok(new TokenResponse(token, refreshToken, tokenIssuer.getExpirationTime(),
+        tokenIssuer.getRefreshExpirationTime()));
   }
 
   @GetMapping("/verify")
   public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String authHeader) {
     try {
       String token = authHeader.replace("Bearer ", "");
-      String username = jwtService.extractUsername(token);
+      String username = jwtDecoder.decode(token).getSubject();
 
       var user = users.findByUsername(username);
 
-      if(user.isLeft()) {
+      if (user.isLeft()) {
         return ResponseEntity.status(401).body(Map.of("error", "Invalid token"));
       }
 

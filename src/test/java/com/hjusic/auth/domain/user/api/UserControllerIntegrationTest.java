@@ -12,7 +12,7 @@ public class UserControllerIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("GET /api/user with admin token returns user list")
   void getUsersAsAdmin() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(get("/api/user")
             .header("Authorization", "Bearer " + adminToken))
@@ -36,7 +36,7 @@ public class UserControllerIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("GET /api/user with non-admin token returns 403")
   void getUsersAsNonAdminReturns403() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     mockMvc.perform(get("/api/user")
             .header("Authorization", "Bearer " + userToken))

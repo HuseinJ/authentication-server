@@ -13,7 +13,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("DELETE /api/user/{username} with admin token deletes user successfully")
   void deleteUserAsAdmin() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(delete("/api/user/{username}", "user")
             .header("Authorization", "Bearer " + adminToken))
@@ -29,7 +29,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("DELETE /api/user/{username} with guest token fails")
   void deleteUserAsGuest() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     mockMvc.perform(delete("/api/user/{username}", "admin")
             .header("Authorization", "Bearer " + userToken))
@@ -66,7 +66,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("DELETE /api/user/{username} with non-existent username returns error")
   void deleteNonExistentUser() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(delete("/api/user/{username}", "nonexistent")
             .header("Authorization", "Bearer " + adminToken))
@@ -81,7 +81,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("DELETE /api/user/{username} with empty username returns error")
   void deleteUserWithEmptyUsername() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(delete("/api/user/{username}", "   ")
             .header("Authorization", "Bearer " + adminToken))
@@ -92,7 +92,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("DELETE /api/user/{username} admin cannot delete themselves")
   void adminCannotDeleteThemselves() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     mockMvc.perform(delete("/api/user/{username}", "admin")
             .header("Authorization", "Bearer " + adminToken))
