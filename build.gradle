@@ -49,7 +49,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
     // Vavr
-    implementation 'io.vavr:vavr:0.10.4'
+    implementation 'io.vavr:vavr:1.0.1'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
