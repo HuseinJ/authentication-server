@@ -44,7 +44,7 @@ class PasswordTest {
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password cannot be empty");
-      verify(passwordHasher, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
   }
 
@@ -60,7 +60,7 @@ class PasswordTest {
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password must be at least 8 characters");
-      verify(passwordHasher, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
 
     @Test
@@ -69,7 +69,7 @@ class PasswordTest {
       Either<UserError, Password> result = Password.encode("12345678", passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordHasher).encode("12345678");
+      verify(passwordHasher).hash("12345678");
     }
 
     @Test
@@ -80,7 +80,7 @@ class PasswordTest {
       Either<UserError, Password> result = Password.encode(password, passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordHasher).encode(password);
+      verify(passwordHasher).hash(password);
     }
 
     @Test
@@ -92,7 +92,7 @@ class PasswordTest {
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password cannot exceed 128 characters");
-      verify(passwordHasher, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
   }
 
@@ -107,7 +107,7 @@ class PasswordTest {
 
       assertThat(result.isRight()).isTrue();
       assertThat(result.get().getValue()).isEqualTo("encoded_mypassword");
-      verify(passwordHasher).encode("mypassword");
+      verify(passwordHasher).hash("mypassword");
     }
 
     @Test
@@ -128,7 +128,7 @@ class PasswordTest {
       Either<UserError, Password> result = Password.encode("short", passwordHasher);
 
       assertThat(result.isLeft()).isTrue();
-      verify(passwordHasher, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
 
     @Test
@@ -139,7 +139,7 @@ class PasswordTest {
       Either<UserError, Password> result = Password.encode(passwordWithSpaces, passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordHasher).encode(" password ");
+      verify(passwordHasher).hash(" password ");
     }
   }
 

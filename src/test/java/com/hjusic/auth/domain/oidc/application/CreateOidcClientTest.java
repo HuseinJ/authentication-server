@@ -150,7 +150,7 @@ class CreateOidcClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings);
 
-      verify(passwordHasher).encode(anyString());
+      verify(passwordHasher).hash(anyString());
     }
   }
 

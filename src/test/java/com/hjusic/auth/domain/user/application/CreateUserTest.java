@@ -69,7 +69,7 @@ class CreateUserTest {
     assertEquals(createdUser, result.get());
 
     verify(auth).findLoggedInUser();
-    verify(passwordHasher).encode(password);
+    verify(passwordHasher).hash(password);
     verify(users).trigger(any());
   }
 
@@ -209,7 +209,7 @@ class CreateUserTest {
     createUser.create("user", "user@test.com", rawPassword, Set.of("ROLE_GUEST"));
 
     // Then
-    verify(passwordHasher).encode(rawPassword);
+    verify(passwordHasher).hash(rawPassword);
     verify(adminUser).createUser(any(), any(), passwordCaptor.capture(), anySet());
 
     // Password object should be created with encoded value
