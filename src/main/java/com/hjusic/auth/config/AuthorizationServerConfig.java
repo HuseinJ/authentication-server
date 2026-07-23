@@ -25,8 +25,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -75,7 +75,7 @@ public class AuthorizationServerConfig {
     http.setSharedObject(OAuth2AuthorizationConsentService.class, authorizationConsentService);
 
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
-        OAuth2AuthorizationServerConfigurer.authorizationServer();
+        new OAuth2AuthorizationServerConfigurer();
 
     http
         .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())

@@ -5,7 +5,6 @@ import com.hjusic.auth.domain.oidc.infrastructure.OidcClientDatabaseEntity;
 import com.hjusic.auth.domain.role.model.RoleName;
 import com.hjusic.auth.domain.user.infrastructure.UserDatabaseEntity;
 import jakarta.persistence.EntityManager;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,11 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
@@ -48,9 +43,6 @@ public class OidcAuthenticationFlowIntegrationTest extends OidcClientApiIntegrat
 
   @Autowired
   private EntityManager entityManager;
-
-  @Autowired
-  private PlatformTransactionManager transactionManager;
 
   @Autowired
   private OAuth2AuthorizationJpaRepository authorizationRepository;
@@ -107,7 +99,6 @@ public class OidcAuthenticationFlowIntegrationTest extends OidcClientApiIntegrat
 
   @Test
   @DisplayName("Full OIDC flow succeeds with valid client")
-  @WithMockUser(username = "user@example.com", authorities = {"ROLE_GUEST"})
   void fullOidcFlowSucceeds() throws Exception {
     // Verify client exists via JPA repo (direct DB check)
     var dbClient = oidcClientRepository.findByClientId(TEST_CLIENT_ID);
@@ -117,70 +108,61 @@ public class OidcAuthenticationFlowIntegrationTest extends OidcClientApiIntegrat
     RegisteredClient client = registeredClientRepository.findByClientId(TEST_CLIENT_ID);
     assertThat(client).as("Client must be findable via RegisteredClientRepository").isNotNull();
 
-    // Step 1: Request Authorization Code (in its own transaction)
-    AtomicReference<String> codeRef = new AtomicReference<>();
+    // Step 1: start the flow anonymously to obtain a session holding the saved authorization request.
+    MvcResult authorizeResult = mockMvc.perform(get("/oauth2/authorize")
+            .queryParam("response_type", "code")
+            .queryParam("client_id", TEST_CLIENT_ID)
+            .queryParam("scope", "openid profile")
+            .queryParam("redirect_uri", TEST_REDIRECT_URI)
+            .queryParam("state", "test-state"))
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
 
-    TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
-    txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    MockHttpSession session = (MockHttpSession) authorizeResult.getRequest().getSession();
+    assertThat(session).isNotNull();
 
-    txTemplate.execute(status -> {
-      try {
-        MvcResult authResult = mockMvc.perform(get("/oauth2/authorize")
-                .queryParam("response_type", "code")
-                .queryParam("client_id", TEST_CLIENT_ID)
-                .queryParam("scope", "openid profile")
-                .queryParam("redirect_uri", TEST_REDIRECT_URI)
-                .queryParam("state", "test-state"))
-            .andDo(print())
-            .andExpect(status().is3xxRedirection())
-            .andReturn();
+    // Step 2: authenticate the resource owner via form login on the same session.
+    mockMvc.perform(post("/oauth2/login")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", TEST_USER_USERNAME)
+            .param("password", TEST_USER_PASSWORD)
+            .session(session))
+        .andExpect(status().is3xxRedirection());
 
-        String location = authResult.getResponse().getHeader("Location");
-        assertThat(location).startsWith(TEST_REDIRECT_URI);
+    // Step 3: resume the authorization request on the authenticated session -> redirect to the client
+    // callback carrying the authorization code (consent is disabled for this client).
+    MvcResult codeResult = mockMvc.perform(get("/oauth2/authorize")
+            .queryParam("response_type", "code")
+            .queryParam("client_id", TEST_CLIENT_ID)
+            .queryParam("scope", "openid profile")
+            .queryParam("redirect_uri", TEST_REDIRECT_URI)
+            .queryParam("state", "test-state")
+            .session(session))
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
 
-        String code = UriComponentsBuilder.fromUriString(location)
-            .build()
-            .getQueryParams()
-            .getFirst("code");
+    String location = codeResult.getResponse().getHeader("Location");
+    assertThat(location).startsWith(TEST_REDIRECT_URI);
 
-        assertThat(code).isNotBlank();
-        codeRef.set(code);
+    String code = UriComponentsBuilder.fromUriString(location)
+        .build()
+        .getQueryParams()
+        .getFirst("code");
+    assertThat(code).isNotBlank();
 
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      return null;
-    });
-
-    // Verify the authorization was persisted
-    System.out.println("=== Verifying DB state after Step 1 ===");
-    authorizationRepository.findAll().forEach(auth -> {
-      System.out.println("Authorization ID: " + auth.getId());
-      System.out.println("Code: " + auth.getAuthorizationCodeValue());
-    });
-
-    // Step 2: Exchange authorization code for tokens (in its own transaction)
-    String code = codeRef.get();
+    // Step 4: exchange the authorization code for tokens.
     String clientAuth = "Basic " + Base64.getEncoder()
         .encodeToString((TEST_CLIENT_ID + ":" + TEST_CLIENT_SECRET).getBytes());
 
-    txTemplate.execute(status -> {
-      try {
-        mockMvc.perform(post("/oauth2/token")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .header("Authorization", clientAuth)
-                .param("grant_type", "authorization_code")
-                .param("code", code)
-                .param("redirect_uri", TEST_REDIRECT_URI))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.access_token").exists())
-            .andExpect(jsonPath("$.id_token").exists());
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      return null;
-    });
+    mockMvc.perform(post("/oauth2/token")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("Authorization", clientAuth)
+            .param("grant_type", "authorization_code")
+            .param("code", code)
+            .param("redirect_uri", TEST_REDIRECT_URI))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.access_token").exists())
+        .andExpect(jsonPath("$.id_token").exists());
   }
 
   @Test
