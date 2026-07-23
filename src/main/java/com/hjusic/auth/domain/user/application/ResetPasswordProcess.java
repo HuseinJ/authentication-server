@@ -7,7 +7,7 @@ import com.hjusic.auth.domain.user.model.ValueObjects.Password;
 import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ResetPasswordProcess {
 
   private final Users users;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
 
   public Either<UserError, User> initiateResetPasswordProcess(String username) {
     var potentialUsername = Username.of(username);
@@ -48,7 +48,7 @@ public class ResetPasswordProcess {
       return Either.left(UserError.creationFailed("User does not exist"));
     }
 
-    var potentialPassword = Password.encode(password, passwordEncoder);
+    var potentialPassword = Password.encode(password, passwordHasher);
     if(potentialPassword.isLeft()) {
       return Either.left(potentialPassword.getLeft());
     }

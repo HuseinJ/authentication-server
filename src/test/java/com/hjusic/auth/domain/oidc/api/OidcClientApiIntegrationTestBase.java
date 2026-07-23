@@ -44,7 +44,7 @@ public abstract class OidcClientApiIntegrationTestBase extends BaseIntegrationTe
   protected PasswordEncoder passwordEncoder;
 
   @Autowired
-  protected com.hjusic.auth.jwt.JwtService jwtService;
+  protected com.hjusic.auth.jwt.TokenIssuer tokenIssuer;
 
   protected UserDatabaseEntity admin;
   protected UserDatabaseEntity user;

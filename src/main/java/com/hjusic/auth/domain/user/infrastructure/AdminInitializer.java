@@ -14,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class AdminInitializer{
 
   private final Users users;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
   private final NotifyEmail notifyEmail;
 
   private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -46,7 +46,7 @@ public class AdminInitializer{
       return;
     }
     var generatedPassword = generateSecurePassword();
-    var passwordResult = Password.encode(generatedPassword, passwordEncoder);
+    var passwordResult = Password.encode(generatedPassword, passwordHasher);
     if (passwordResult.isLeft()) {
       log.error("Failed to encode default password: {}", passwordResult.getLeft().getMessage());
       return;

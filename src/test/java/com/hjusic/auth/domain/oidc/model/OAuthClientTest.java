@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Set;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,9 +38,9 @@ class OAuthClientTest {
   void setUp() {
     clientId = ClientId.of("test-client").get();
     clientName = ClientName.of("Test Client").get();
-    var passwordEncoder = mock(PasswordEncoder.class);
-    when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-    clientSecret = ClientSecret.generate(passwordEncoder);
+    var passwordHasher = mock(PasswordHasher.class);
+    when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+    clientSecret = ClientSecret.generate(passwordHasher);
     grantTypes = Set.of(AuthorizationGrantType.AUTHORIZATION_CODE);
     authenticationMethods = Set.of(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
     redirectUris = Set.of(RedirectUri.of("https://example.com/callback").get());
@@ -116,13 +116,13 @@ class OAuthClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings, clientSecret);
 
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
 
       var event2 = OidcClient.create(
           ClientId.of("another-client").get(), clientName, grantTypes, authenticationMethods,
           redirectUris, postLogoutRedirectUris, scopes,
-          tokenSettings, clientSettings, ClientSecret.generate(passwordEncoder));
+          tokenSettings, clientSettings, ClientSecret.generate(passwordHasher));
 
       assertThat(event1.getClient().getId()).isNotEqualTo(event2.getClient().getId());
     }
@@ -285,18 +285,18 @@ class OAuthClientTest {
     void shouldGenerateNewSecret() {
       var originalSecret = existingClient.getClientSecret();
 
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      var event = existingClient.regenerateSecret(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      var event = existingClient.regenerateSecret(passwordHasher);
 
       assertThat(event.getClient().getClientSecret()).isNotEqualTo(originalSecret);
     }
 
     @Test
     void shouldReturnEventWithPlainTextSecret() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      var event = existingClient.regenerateSecret(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      var event = existingClient.regenerateSecret(passwordHasher);
 
       assertThat(event.getNewClientSecret().getPlainText()).isNotNull();
       assertThat(event.getNewClientSecret().getPlainText()).isNotBlank();
@@ -304,9 +304,9 @@ class OAuthClientTest {
 
     @Test
     void shouldReturnEventWithUpdatedClient() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      var event = existingClient.regenerateSecret(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      var event = existingClient.regenerateSecret(passwordHasher);
 
       assertThat(event.getClient()).isEqualTo(existingClient);
       assertThat(event.getClient().getClientSecret()).isEqualTo(event.getNewClientSecret());
@@ -319,9 +319,9 @@ class OAuthClientTest {
       var originalClientName = existingClient.getClientName();
       var originalGrantTypes = existingClient.getGrantTypes();
 
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      var event = existingClient.regenerateSecret(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      var event = existingClient.regenerateSecret(passwordHasher);
 
       assertThat(event.getClient().getId()).isEqualTo(originalId);
       assertThat(event.getClient().getClientId()).isEqualTo(originalClientId);
@@ -331,12 +331,12 @@ class OAuthClientTest {
 
     @Test
     void shouldGenerateDifferentSecretOnEachCall() {
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
-      var event1 = existingClient.regenerateSecret(passwordEncoder);
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
+      var event1 = existingClient.regenerateSecret(passwordHasher);
       var secret1 = event1.getNewClientSecret().getPlainText();
 
-      var event2 = existingClient.regenerateSecret(passwordEncoder);
+      var event2 = existingClient.regenerateSecret(passwordHasher);
       var secret2 = event2.getNewClientSecret().getPlainText();
 
       assertThat(secret1).isNotEqualTo(secret2);
@@ -395,13 +395,13 @@ class OAuthClientTest {
           clientId, clientName, grantTypes, authenticationMethods,
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings, clientSecret);
-      var passwordEncoder = mock(PasswordEncoder.class);
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      var passwordHasher = mock(PasswordHasher.class);
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
 
       var event2 = OidcClient.create(
           ClientId.of("different-client").get(), clientName, grantTypes, authenticationMethods,
           redirectUris, postLogoutRedirectUris, scopes,
-          tokenSettings, clientSettings, ClientSecret.generate(passwordEncoder));
+          tokenSettings, clientSettings, ClientSecret.generate(passwordHasher));
 
       assertThat(event1.getClient()).isNotEqualTo(event2.getClient());
     }

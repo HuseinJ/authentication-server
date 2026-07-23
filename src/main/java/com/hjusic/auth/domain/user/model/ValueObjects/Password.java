@@ -1,14 +1,13 @@
 package com.hjusic.auth.domain.user.model.ValueObjects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import com.hjusic.auth.domain.user.model.UserError;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.StringUtils;
 
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -25,14 +24,14 @@ public final class Password {
 
   private final String value;
 
-  public static Either<UserError, Password> encode(String password, PasswordEncoder encoder) {
+  public static Either<UserError, Password> encode(String password, PasswordHasher hasher) {
     return validateNotEmpty(password)
         .flatMap(Password::validateLength)
-        .map(either -> new Password(encoder.encode(either)));
+        .map(either -> new Password(hasher.hash(either)));
   }
 
   private static Either<UserError, String> validateNotEmpty(String password) {
-    return StringUtils.hasText(password)
+    return password != null && !password.isBlank()
         ? Either.right(password)
         : Either.left(UserError.validationFailed("Password cannot be empty"));
   }

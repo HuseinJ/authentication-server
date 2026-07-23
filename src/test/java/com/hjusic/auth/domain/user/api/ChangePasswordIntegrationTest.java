@@ -21,7 +21,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with valid old password changes password successfully")
   void changePasswordSuccessfully() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "password123",
@@ -43,7 +43,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with incorrect old password fails")
   void changePasswordWithWrongOldPassword() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "wrongOldPassword",
@@ -74,7 +74,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
     mockMvc.perform(put("/api/user/password")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
 
     // Verify password was NOT changed
     var unchangedUser = userRepository.findByUsername("user").get();
@@ -103,7 +103,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with empty old password fails")
   void changePasswordWithEmptyOldPassword() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "",
@@ -126,7 +126,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with null old password fails")
   void changePasswordWithNullOldPassword() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         null,
@@ -148,7 +148,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with weak new password fails")
   void changePasswordWithWeakNewPassword() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "password123",
@@ -170,7 +170,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with blank old password fails")
   void changePasswordWithBlankOldPassword() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "   ",
@@ -193,7 +193,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password admin can change their own password")
   void adminCanChangeTheirPassword() throws Exception {
-    String adminToken = jwtService.generateToken(admin);
+    String adminToken = tokenIssuer.generateToken(admin);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "password123",
@@ -215,7 +215,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password changes only the authenticated user's password")
   void changePasswordOnlyAffectsAuthenticatedUser() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     ChangePasswordRequest request = new ChangePasswordRequest(
         "password123",
@@ -239,7 +239,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
   @Test
   @DisplayName("PUT /api/user/password with missing request body fails")
   void changePasswordWithMissingBody() throws Exception {
-    String userToken = jwtService.generateToken(user);
+    String userToken = tokenIssuer.generateToken(user);
 
     mockMvc.perform(put("/api/user/password")
             .header("Authorization", "Bearer " + userToken)

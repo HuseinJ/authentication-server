@@ -12,7 +12,7 @@ import com.hjusic.auth.domain.user.model.ValueObjects.Username;
 import io.vavr.control.Either;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class CreateUser {
 
   private final Auth auth;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
   private final Users users;
 
   public Either<UserError, User> create(String username, String email, String password,
@@ -36,7 +36,7 @@ public class CreateUser {
       return Either.left(potentialEmail.getLeft());
     }
 
-    var potentialPassword = Password.encode(password, passwordEncoder);
+    var potentialPassword = Password.encode(password, passwordHasher);
     if(potentialPassword.isLeft()) {
       return Either.left(potentialPassword.getLeft());
     }

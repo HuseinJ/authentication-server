@@ -29,7 +29,7 @@ class UpdateUserRolesIntegrationTest extends UserApiIntegrationTestBase {
   @DisplayName("Should allow admin to update user roles successfully")
   void shouldAllowAdminToUpdateUserRoles() throws Exception {
     // Given
-    var adminToken = jwtService.generateToken(admin);
+    var adminToken = tokenIssuer.generateToken(admin);
 
     UpdateRoleRequest updateRequest = new UpdateRoleRequest();
     updateRequest.setRoles(Set.of(RoleName.ROLE_ADMIN, RoleName.ROLE_GUEST));
@@ -53,7 +53,7 @@ class UpdateUserRolesIntegrationTest extends UserApiIntegrationTestBase {
   @DisplayName("Should reject role update if not admin")
   void shouldRejectRoleUpdateIfNotAdmin() throws Exception {
     // Given - a normal user (ROLE_GUEST)
-    var userToken = jwtService.generateToken(user);
+    var userToken = tokenIssuer.generateToken(user);
 
     UpdateRoleRequest updateRequest = new UpdateRoleRequest();
     updateRequest.setRoles(Set.of(RoleName.ROLE_ADMIN));
@@ -70,7 +70,7 @@ class UpdateUserRolesIntegrationTest extends UserApiIntegrationTestBase {
   @DisplayName("Should return 400 when updating non-existent user")
   void shouldReturnBadRequestWhenUserNotFound() throws Exception {
     // Given
-    var adminToken = jwtService.generateToken(admin);
+    var adminToken = tokenIssuer.generateToken(admin);
 
     UpdateRoleRequest updateRequest = new UpdateRoleRequest();
     updateRequest.setRoles(Set.of(RoleName.ROLE_GUEST));
@@ -95,6 +95,6 @@ class UpdateUserRolesIntegrationTest extends UserApiIntegrationTestBase {
     mockMvc.perform(post("/api/user/roles/{username}", user.getUsername())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateRequest)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 }

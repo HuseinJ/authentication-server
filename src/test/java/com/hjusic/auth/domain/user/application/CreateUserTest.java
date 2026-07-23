@@ -16,7 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 import java.util.Set;
 
@@ -31,7 +31,7 @@ class CreateUserTest {
   private Auth auth;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
+  private PasswordHasher passwordHasher;
 
   @Mock
   private Users users;
@@ -57,7 +57,7 @@ class CreateUserTest {
     Set<String> roles = Set.of("ROLE_GUEST");
 
     when(auth.findLoggedInUser()).thenReturn(Either.right(adminUser));
-    when(passwordEncoder.encode(password)).thenReturn("encoded_password");
+    when(passwordHasher.hash(password)).thenReturn("encoded_password");
     when(adminUser.createUser(any(), any(), any(), anySet())).thenReturn(mock(UserCreatedEvent.class));
     when(users.trigger(any())).thenReturn(createdUser);
 
@@ -69,7 +69,7 @@ class CreateUserTest {
     assertEquals(createdUser, result.get());
 
     verify(auth).findLoggedInUser();
-    verify(passwordEncoder).encode(password);
+    verify(passwordHasher).hash(password);
     verify(users).trigger(any());
   }
 
@@ -79,7 +79,7 @@ class CreateUserTest {
     Set<String> roles = Set.of("ROLE_ADMIN", "ROLE_GUEST");
 
     when(auth.findLoggedInUser()).thenReturn(Either.right(adminUser));
-    when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+    when(passwordHasher.hash(anyString())).thenReturn("encoded");
     when(adminUser.createUser(any(), any(), any(), anySet())).thenReturn(mock(UserCreatedEvent.class));
     when(users.trigger(any())).thenReturn(createdUser);
 
@@ -109,7 +109,7 @@ class CreateUserTest {
     assertTrue(result.isLeft());
     assertInstanceOf(UserError.class, result.getLeft());
 
-    verifyNoInteractions(auth, passwordEncoder, users);
+    verifyNoInteractions(auth, passwordHasher, users);
   }
 
   @Test
@@ -124,7 +124,7 @@ class CreateUserTest {
     assertTrue(result.isLeft());
     assertInstanceOf(UserError.class, result.getLeft());
 
-    verifyNoInteractions(auth, passwordEncoder, users);
+    verifyNoInteractions(auth, passwordHasher, users);
   }
 
   @Test
@@ -139,7 +139,7 @@ class CreateUserTest {
     assertTrue(result.isLeft());
     assertInstanceOf(UserError.class, result.getLeft());
 
-    verifyNoInteractions(auth, passwordEncoder, users);
+    verifyNoInteractions(auth, passwordHasher, users);
   }
 
   @Test
@@ -147,7 +147,7 @@ class CreateUserTest {
     // Given
     AuthError authError = AuthError.notAuthenticated();
     when(auth.findLoggedInUser()).thenReturn(Either.left(authError));
-    when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+    when(passwordHasher.hash(anyString())).thenReturn("encoded");
 
     // When
     var result = createUser.create("user", "user@test.com", "Pass123!", Set.of("ROLE_USER"));
@@ -164,7 +164,7 @@ class CreateUserTest {
   void shouldReturnErrorWhenAuthenticatedUserIsNotAdmin() {
     // Given - regular user (not admin) is authenticated
     when(auth.findLoggedInUser()).thenReturn(Either.right(regularUser));
-    when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+    when(passwordHasher.hash(anyString())).thenReturn("encoded");
 
     // When
     var result = createUser.create("newuser", "new@test.com", "Pass123!", Set.of("ROLE_USER"));
@@ -199,7 +199,7 @@ class CreateUserTest {
     String encodedPassword = "encoded_hash_value";
 
     when(auth.findLoggedInUser()).thenReturn(Either.right(adminUser));
-    when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
+    when(passwordHasher.hash(rawPassword)).thenReturn(encodedPassword);
     when(adminUser.createUser(any(), any(), any(), anySet())).thenReturn(mock(UserCreatedEvent.class));
     when(users.trigger(any())).thenReturn(createdUser);
 
@@ -209,7 +209,7 @@ class CreateUserTest {
     createUser.create("user", "user@test.com", rawPassword, Set.of("ROLE_GUEST"));
 
     // Then
-    verify(passwordEncoder).encode(rawPassword);
+    verify(passwordHasher).hash(rawPassword);
     verify(adminUser).createUser(any(), any(), passwordCaptor.capture(), anySet());
 
     // Password object should be created with encoded value
@@ -222,7 +222,7 @@ class CreateUserTest {
     UserCreatedEvent userCreatedEvent = mock(UserCreatedEvent.class);
 
     when(auth.findLoggedInUser()).thenReturn(Either.right(adminUser));
-    when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+    when(passwordHasher.hash(anyString())).thenReturn("encoded");
     when(adminUser.createUser(any(), any(), any(), anySet())).thenReturn(userCreatedEvent);
     when(users.trigger(userCreatedEvent)).thenReturn(createdUser);
 
@@ -240,7 +240,7 @@ class CreateUserTest {
     Set<String> emptyRoles = Set.of();
 
     when(auth.findLoggedInUser()).thenReturn(Either.right(adminUser));
-    when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+    when(passwordHasher.hash(anyString())).thenReturn("encoded");
     when(adminUser.createUser(any(), any(), any(), anySet())).thenReturn(mock(UserCreatedEvent.class));
     when(users.trigger(any())).thenReturn(createdUser);
 

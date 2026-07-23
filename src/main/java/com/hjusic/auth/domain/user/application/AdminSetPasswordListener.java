@@ -1,4 +1,4 @@
-package com.hjusic.auth.domain.user.model.listener;
+package com.hjusic.auth.domain.user.application;
 
 import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.domain.user.model.event.UserCreatedEvent;

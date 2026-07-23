@@ -16,7 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 import java.time.Duration;
 import java.util.Set;
@@ -33,7 +33,7 @@ class CreateOidcClientTest {
   private OidcClients clients;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
+  private PasswordHasher passwordHasher;
 
   @InjectMocks
   private CreateOidcClient createOidcClient;
@@ -69,7 +69,7 @@ class CreateOidcClientTest {
     @BeforeEach
     void setUp() {
       when(clients.findByClientId(any(ClientId.class))).thenReturn(Optional.empty());
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> {
             OAuthClientCreatedEvent event = invocation.getArgument(0);
@@ -150,7 +150,7 @@ class CreateOidcClientTest {
           redirectUris, postLogoutRedirectUris, scopes,
           tokenSettings, clientSettings);
 
-      verify(passwordEncoder).encode(anyString());
+      verify(passwordHasher).hash(anyString());
     }
   }
 
@@ -298,7 +298,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptValidGrantTypes() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -336,7 +336,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptValidAuthenticationMethods() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -387,7 +387,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptHttpsRedirectUri() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -403,7 +403,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptLocalhostHttpRedirectUri() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -419,7 +419,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptMultipleRedirectUris() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -461,7 +461,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptValidPostLogoutRedirectUris() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -499,7 +499,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptStandardOidcScopes() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 
@@ -515,7 +515,7 @@ class CreateOidcClientTest {
 
     @Test
     void shouldAcceptCustomScopes() {
-      when(passwordEncoder.encode(anyString())).thenReturn("hashed-secret");
+      when(passwordHasher.hash(anyString())).thenReturn("hashed-secret");
       when(clients.trigger(any(OAuthClientCreatedEvent.class)))
           .thenAnswer(invocation -> ((OAuthClientCreatedEvent) invocation.getArgument(0)).getClient());
 

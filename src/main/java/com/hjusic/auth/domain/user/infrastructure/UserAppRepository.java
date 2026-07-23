@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,7 +32,7 @@ public class UserAppRepository implements Users {
   private final ResetPasswordProcessDatabaseRepository resetPasswordProcessDatabaseRepository;
   private final UserMapper userMapper;
   private final DomainEventPublisher domainEventPublisher;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordHasher passwordHasher;
 
   @Override
   public Collection<User> findAll() {
@@ -58,7 +58,7 @@ public class UserAppRepository implements Users {
     if (StringUtils.isBlank(hash)) {
       return false;
     }
-    return passwordEncoder.matches(plaintext, hash);
+    return passwordHasher.matches(plaintext, hash);
   }
 
   @Override

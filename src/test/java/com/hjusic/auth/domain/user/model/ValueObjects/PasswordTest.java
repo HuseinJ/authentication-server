@@ -16,18 +16,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.hjusic.auth.crypto.model.PasswordHasher;
 
 import java.io.*;
 
 class PasswordTest {
 
-  private PasswordEncoder passwordEncoder;
+  private PasswordHasher passwordHasher;
 
   @BeforeEach
   void setUp() {
-    passwordEncoder = mock(PasswordEncoder.class);
-    when(passwordEncoder.encode(anyString()))
+    passwordHasher = mock(PasswordHasher.class);
+    when(passwordHasher.hash(anyString()))
         .thenAnswer(invocation -> "encoded_" + invocation.getArgument(0));
   }
 
@@ -40,11 +40,11 @@ class PasswordTest {
     @ValueSource(strings = {"  ", "\t", "\n"})
     @DisplayName("Should reject null, empty or blank password")
     void shouldRejectNullOrBlankPassword(String password) {
-      Either<UserError, Password> result = Password.encode(password, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(password, passwordHasher);
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password cannot be empty");
-      verify(passwordEncoder, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
   }
 
@@ -56,20 +56,20 @@ class PasswordTest {
     @ValueSource(strings = {"a", "ab", "abc", "abcd", "abcde", "abcdef", "abcdefg"})
     @DisplayName("Should reject passwords shorter than 8 characters")
     void shouldRejectShortPasswords(String password) {
-      Either<UserError, Password> result = Password.encode(password, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(password, passwordHasher);
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password must be at least 8 characters");
-      verify(passwordEncoder, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
 
     @Test
     @DisplayName("Should accept password with exactly 8 characters")
     void shouldAcceptMinimumLength() {
-      Either<UserError, Password> result = Password.encode("12345678", passwordEncoder);
+      Either<UserError, Password> result = Password.encode("12345678", passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordEncoder).encode("12345678");
+      verify(passwordHasher).hash("12345678");
     }
 
     @Test
@@ -77,10 +77,10 @@ class PasswordTest {
     void shouldAcceptMaximumLength() {
       String password = "a".repeat(128);
 
-      Either<UserError, Password> result = Password.encode(password, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(password, passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordEncoder).encode(password);
+      verify(passwordHasher).hash(password);
     }
 
     @Test
@@ -88,11 +88,11 @@ class PasswordTest {
     void shouldRejectPasswordTooLong() {
       String password = "a".repeat(129);
 
-      Either<UserError, Password> result = Password.encode(password, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(password, passwordHasher);
 
       assertThat(result.isLeft()).isTrue();
       assertThat(result.getLeft().getMessage()).contains("Password cannot exceed 128 characters");
-      verify(passwordEncoder, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
   }
 
@@ -103,11 +103,11 @@ class PasswordTest {
     @Test
     @DisplayName("Should encode valid password")
     void shouldEncodeValidPassword() {
-      Either<UserError, Password> result = Password.encode("mypassword", passwordEncoder);
+      Either<UserError, Password> result = Password.encode("mypassword", passwordHasher);
 
       assertThat(result.isRight()).isTrue();
       assertThat(result.get().getValue()).isEqualTo("encoded_mypassword");
-      verify(passwordEncoder).encode("mypassword");
+      verify(passwordHasher).hash("mypassword");
     }
 
     @Test
@@ -115,7 +115,7 @@ class PasswordTest {
     void shouldStoreEncodedValue() {
       String plainPassword = "plainPassword123";
 
-      Either<UserError, Password> result = Password.encode(plainPassword, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(plainPassword, passwordHasher);
 
       assertThat(result.isRight()).isTrue();
       assertThat(result.get().getValue()).isNotEqualTo(plainPassword);
@@ -125,10 +125,10 @@ class PasswordTest {
     @Test
     @DisplayName("Should not encode if validation fails")
     void shouldNotEncodeInvalidPassword() {
-      Either<UserError, Password> result = Password.encode("short", passwordEncoder);
+      Either<UserError, Password> result = Password.encode("short", passwordHasher);
 
       assertThat(result.isLeft()).isTrue();
-      verify(passwordEncoder, never()).encode(anyString());
+      verify(passwordHasher, never()).hash(anyString());
     }
 
     @Test
@@ -136,10 +136,10 @@ class PasswordTest {
     void shouldNotTrimPassword() {
       String passwordWithSpaces = " password ";
 
-      Either<UserError, Password> result = Password.encode(passwordWithSpaces, passwordEncoder);
+      Either<UserError, Password> result = Password.encode(passwordWithSpaces, passwordHasher);
 
       assertThat(result.isRight()).isTrue();
-      verify(passwordEncoder).encode(" password ");
+      verify(passwordHasher).hash(" password ");
     }
   }
 
@@ -150,7 +150,7 @@ class PasswordTest {
     @Test
     @DisplayName("Should not expose password in toString")
     void shouldNotExposePasswordInToString() {
-      Password password = Password.encode("mypassword", passwordEncoder).get();
+      Password password = Password.encode("mypassword", passwordHasher).get();
 
       String toString = password.toString();
 
