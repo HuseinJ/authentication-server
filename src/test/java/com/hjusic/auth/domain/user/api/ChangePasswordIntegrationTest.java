@@ -74,7 +74,7 @@ class ChangePasswordIntegrationTest extends UserApiIntegrationTestBase {
     mockMvc.perform(put("/api/user/password")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
 
     // Verify password was NOT changed
     var unchangedUser = userRepository.findByUsername("user").get();

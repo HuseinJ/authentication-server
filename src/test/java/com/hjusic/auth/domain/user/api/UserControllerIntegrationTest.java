@@ -26,10 +26,10 @@ public class UserControllerIntegrationTest extends UserApiIntegrationTestBase {
   }
 
   @Test
-  @DisplayName("GET /api/user without authentication returns 403")
-  void getUsersWithoutAuthReturns403() throws Exception {
+  @DisplayName("GET /api/user without authentication returns 401")
+  void getUsersWithoutAuthReturns401() throws Exception {
     mockMvc.perform(get("/api/user"))
-        .andExpect(status().isForbidden())
+        .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.length()").doesNotExist());
   }
 

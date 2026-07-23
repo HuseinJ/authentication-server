@@ -95,6 +95,6 @@ class UpdateUserRolesIntegrationTest extends UserApiIntegrationTestBase {
     mockMvc.perform(post("/api/user/roles/{username}", user.getUsername())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateRequest)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 }

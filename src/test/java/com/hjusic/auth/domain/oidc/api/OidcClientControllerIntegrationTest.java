@@ -40,10 +40,10 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void getAllClientsWithoutAuthReturns403() throws Exception {
       mockMvc.perform(get("/api/oidc/clients"))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -104,10 +104,10 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void getClientWithoutAuthReturns403() throws Exception {
       mockMvc.perform(get("/api/oidc/clients/{id}", existingClient.getId()))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -262,7 +262,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void createClientWithoutAuthReturns403() throws Exception {
 
       var tokenSettings =
@@ -288,7 +288,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
       mockMvc.perform(post("/api/oidc/clients")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(request)))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -399,7 +399,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void updateClientWithoutAuthReturns403() throws Exception {
       var request = UpdateOidcClientRequest.builder()
           .clientName("Updated Client Name")
@@ -414,7 +414,7 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
       mockMvc.perform(put("/api/oidc/clients/{id}", existingClient.getId())
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(request)))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -483,10 +483,10 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void deleteClientWithoutAuthReturns403() throws Exception {
       mockMvc.perform(delete("/api/oidc/clients/{id}", existingClient.getId()))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -542,10 +542,10 @@ public class OidcClientControllerIntegrationTest extends OidcClientApiIntegratio
     }
 
     @Test
-    @DisplayName("without authentication returns 403")
+    @DisplayName("without authentication returns 401")
     void regenerateSecretWithoutAuthReturns403() throws Exception {
       mockMvc.perform(post("/api/oidc/clients/{id}/regenerate-secret", existingClient.getId()))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test

@@ -44,7 +44,7 @@ public class UserDeletionIntegrationTest extends UserApiIntegrationTestBase {
   @DisplayName("DELETE /api/user/{username} without authentication fails")
   void deleteUserWithoutAuth() throws Exception {
     mockMvc.perform(delete("/api/user/{username}", "user"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
 
     // Verify user was NOT deleted from database
     var existingUser = userRepository.findByUsername("user");
