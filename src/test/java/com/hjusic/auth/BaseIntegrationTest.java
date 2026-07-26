@@ -1,7 +1,6 @@
 package com.hjusic.auth;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -13,7 +12,6 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles({"test", "jwt", "kafka"})
-@Import(TestKafkaConfig.class)
 public abstract class BaseIntegrationTest {
 
   private static final PostgreSQLContainer<?> postgres;
