@@ -1,0 +1,31 @@
+name: GHCR Cleanup
+
+on:
+  schedule:
+    # Every Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Only log what would be deleted'
+        type: boolean
+        default: true
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Multi-arch aware: keeps the platform/attestation manifests of kept images
+      - name: Delete old container images
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          package: ${{ github.event.repository.name }}
+          keep-n-tagged: 10
+          exclude-tags: latest
+          delete-untagged: true
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
