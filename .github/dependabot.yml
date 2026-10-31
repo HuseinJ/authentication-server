@@ -9,6 +9,8 @@ updates:
     groups:
       gradle-minor-and-patch:
         update-types: [ "minor", "patch" ]
+      gradle-major:
+        update-types: [ "major" ]
 
   - package-ecosystem: "github-actions"
     directory: "/"
