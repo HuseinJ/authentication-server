@@ -2,6 +2,8 @@ package com.hjusic.auth.domain.auth.api;
 
 import com.hjusic.auth.domain.auth.api.dto.LoginRequest;
 import com.hjusic.auth.domain.auth.api.dto.TokenResponse;
+import com.hjusic.auth.domain.mfa.infrastructure.security.SecondFactorAuthenticator;
+import com.hjusic.auth.domain.mfa.infrastructure.security.SecondFactorAuthorizationManager;
 import com.hjusic.auth.domain.user.model.Users;
 import com.hjusic.auth.jwt.TokenIssuer;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.ott.OneTimeTokenService;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -32,7 +36,11 @@ class AuthControllerTest {
     TokenIssuer tokenIssuer = mock(TokenIssuer.class);
     Users users = mock(Users.class);
     JwtDecoder jwtDecoder = mock(JwtDecoder.class);
-    AuthController controller = new AuthController(authenticationManager, users, tokenIssuer, jwtDecoder);
+    SecondFactorAuthorizationManager mfaPolicy = mock(SecondFactorAuthorizationManager.class);
+    when(mfaPolicy.authorize(any(), any())).thenReturn(new AuthorizationDecision(true));
+    AuthController controller = new AuthController(authenticationManager, users, tokenIssuer,
+        jwtDecoder, mfaPolicy, mock(SecondFactorAuthenticator.class),
+        mock(OneTimeTokenService.class));
 
     LoginRequest req = new LoginRequest();
     req.setUsername("alice");
@@ -51,11 +59,11 @@ class AuthControllerTest {
     when(tokenIssuer.getRefreshExpirationTime()).thenReturn(604800000L);
 
     // Act
-    ResponseEntity<TokenResponse> response = controller.login(req);
+    ResponseEntity<?> response = controller.login(req);
 
     // Assert
     assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-    TokenResponse body = response.getBody();
+    TokenResponse body = (TokenResponse) response.getBody();
     assertThat(body).isNotNull();
     assertThat(body.getType()).isEqualTo("Bearer");
     assertThat(body.getToken()).isEqualTo("access.jwt.token");

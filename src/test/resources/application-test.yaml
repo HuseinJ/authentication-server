@@ -10,6 +10,11 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 auth:
+  mfa:
+    totp:
+      issuer: "Test Issuer"
+      encryption-password: "test-only-totp-encryption-password"
+      encryption-salt: "5c0744940b5c369b"
   ui: "http://localhost:3000"
   cors:
     allowed-origins:

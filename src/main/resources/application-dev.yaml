@@ -68,6 +68,13 @@ server:
     key-alias: testing-authenticator
 
 auth:
+  mfa:
+    totp:
+      issuer: "Authentication Server (dev)"
+      # Key material for encrypting TOTP secrets at rest. Dev-only values; override in
+      # production via AUTH_MFA_TOTP_ENCRYPTION_PASSWORD / AUTH_MFA_TOTP_ENCRYPTION_SALT.
+      encryption-password: "hNyFiH0fJAdHH9Yc4ebOjtOjfIme1Xc9fBQOhwB1fqY"
+      encryption-salt: "384e08e16fc21706d11bfeacc435ce0c"
   ui: "http://localhost:5173"
   cors:
     allowed-origins:
