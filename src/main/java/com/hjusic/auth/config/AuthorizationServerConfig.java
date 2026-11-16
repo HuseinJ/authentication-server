@@ -1,5 +1,10 @@
 package com.hjusic.auth.config;
 
+import com.hjusic.auth.domain.mfa.infrastructure.security.SecondFactorAuthenticator;
+import com.hjusic.auth.domain.mfa.infrastructure.security.SecondFactorAuthorities;
+import com.hjusic.auth.domain.mfa.infrastructure.security.SecondFactorAuthorizationManager;
+import com.hjusic.auth.domain.mfa.infrastructure.security.TotpAuthenticationFilter;
+import com.hjusic.auth.domain.mfa.model.SecondFactorType;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaOAuth2AuthorizationConsentService;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaOAuth2AuthorizationService;
 import com.hjusic.auth.domain.oidc.infrastructure.JpaRegisteredClientRepository;
@@ -29,8 +34,16 @@ import org.springframework.security.config.annotation.web.configuration.OAuth2Au
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.DelegatingMissingAuthorityAccessDeniedHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.security.KeyFactory;
@@ -67,6 +80,13 @@ public class AuthorizationServerConfig {
 
   private final CorsConfigurationSource corsConfigurationSource;
 
+  private final SecondFactorAuthorizationManager secondFactorAuthorizationManager;
+
+  private final SecondFactorAuthenticator secondFactorAuthenticator;
+
+  /** The UI POSTs the TOTP code ({@code code} form field) here after the password step. */
+  public static final String TOTP_LOGIN_URL = "/oauth2/login/mfa/totp";
+
   @Bean
   @Order(1)
   public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -87,6 +107,10 @@ public class AuthorizationServerConfig {
             )
         )
         .authorizeHttpRequests(authorize -> authorize
+            // Issuing an authorization code is what logs a user into a client, so this is where
+            // the per-user MFA policy (password + an enrolled second factor) is enforced.
+            .requestMatchers(authorizationServerSettings().getAuthorizationEndpoint())
+            .access(secondFactorAuthorizationManager)
             .anyRequest().authenticated()
         )
         .exceptionHandling(exceptions -> exceptions
@@ -94,6 +118,7 @@ public class AuthorizationServerConfig {
                 new LoginUrlAuthenticationEntryPoint(uiBaseUrl + "/login?flow=oidc"),
                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
             )
+            .accessDeniedHandler(missingSecondFactorHandler())
         )
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
@@ -103,12 +128,23 @@ public class AuthorizationServerConfig {
   @Bean
   @Order(3)
   public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
+    TotpAuthenticationFilter totpFilter = new TotpAuthenticationFilter(TOTP_LOGIN_URL,
+        secondFactorAuthenticator.asAuthenticationManager());
+    totpFilter.setSecurityContextRepository(new DelegatingSecurityContextRepository(
+        new RequestAttributeSecurityContextRepository(), new HttpSessionSecurityContextRepository()));
+    totpFilter.setSessionAuthenticationStrategy(new ChangeSessionIdAuthenticationStrategy());
+    totpFilter.setAuthenticationSuccessHandler(new SavedRequestAwareAuthenticationSuccessHandler());
+    totpFilter.setAuthenticationFailureHandler((request, response, exception) ->
+        response.sendRedirect(uiBaseUrl + "/login/mfa?flow=oidc&factor.type="
+            + SecondFactorType.TOTP.getId() + "&error=true"));
+
     http
-        .securityMatcher("/oauth2/login", "/logout", "/connect/logout", "/error")
+        .securityMatcher("/oauth2/login", TOTP_LOGIN_URL, "/logout", "/connect/logout", "/error")
         .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(authorize -> authorize
             .anyRequest().permitAll()
         )
+        .addFilterAfter(totpFilter, UsernamePasswordAuthenticationFilter.class)
         .formLogin(form -> form
             .loginProcessingUrl("/oauth2/login")  // frontend POSTs credentials here
             .successHandler(new SavedRequestAwareAuthenticationSuccessHandler()) // resumes oauth2 flow
@@ -140,6 +176,25 @@ public class AuthorizationServerConfig {
         .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
+  }
+
+  /**
+   * A session that is signed in but lacks a second factor is sent to the UI page for that factor.
+   * The original authorize request is saved, so after the factor step the OIDC flow resumes.
+   * New factors only need a {@link SecondFactorType} constant to be routed there.
+   */
+  private AccessDeniedHandler missingSecondFactorHandler() {
+    DelegatingMissingAuthorityAccessDeniedHandler.Builder builder =
+        DelegatingMissingAuthorityAccessDeniedHandler.builder();
+    for (SecondFactorType type : SecondFactorType.values()) {
+      builder.addEntryPointFor(
+          // Spring appends factor.type=<factor>&factor.reason=missing|expired for the UI.
+          new LoginUrlAuthenticationEntryPoint(uiBaseUrl + "/login/mfa?flow=oidc"),
+          SecondFactorAuthorities.authorityOf(type));
+    }
+    DelegatingMissingAuthorityAccessDeniedHandler handler = builder.build();
+    handler.setRequestCache(new HttpSessionRequestCache());
+    return handler;
   }
 
   @Bean

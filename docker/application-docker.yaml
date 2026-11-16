@@ -24,6 +24,13 @@ spring:
         spring.json.trusted.packages: '*'
 
 auth:
+  mfa:
+    totp:
+      issuer: "Authentication Server"
+      # Override in real deployments via AUTH_MFA_TOTP_ENCRYPTION_PASSWORD and
+      # AUTH_MFA_TOTP_ENCRYPTION_SALT (hex). Changing them makes existing TOTP secrets unreadable.
+      encryption-password: "7F2OjFc4ANf-8z85OhvNKQl7D5ZfQhfnVtiXxno00lI"
+      encryption-salt: "950fb42d24d1e18c6aab97e8a63ad778"
   ui: "https://ui.authenticator.com"
   cors:
     allowed-origins:
